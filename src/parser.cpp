@@ -31,13 +31,8 @@ namespace wunner
           // do nothing as of now
       }
   }
-
-  Parser::~Parser()
-  {
-
-  }
   
-  void Parser::tokenizer(std::string const & document)
+  void Parser::tokenizer(std::string const & document) const
   {
       boost::char_separator<char> sep(",.@|-\"\"\'\' \n");
       std::ifstream fin("../" + document);
@@ -56,7 +51,16 @@ namespace wunner
       }
   }
 
-  void Parser::normalizer()
+  void Parser::query_tokenizer(std::string const & query) const
+  {
+      boost::char_separator<char> sep(",.@|-\"\"\'\' \n");
+      boost::tokenizer<boost::char_separator<char>> tokens(query, sep);
+      for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it) {
+          parsed_doc.push_back(*it);
+      }
+  }
+
+  void Parser::normalizer() const
   {
       for (auto & word : parsed_doc) {
            std::transform(word.begin(), word.end(), word.begin(), ::tolower);
@@ -92,11 +96,20 @@ namespace wunner
 
   const std::pair<std::string, std::vector<std::string>> & Parser::get_parsed_document(std::string const & document) const
   {
-      parsed_doc = tokenizer(document);
+      parsed_doc.clear();
+      tokenizer(document);
       normalizer();
       stop_words_removal();
       stemmer();
       return std::make_pair(document, parsed_doc);
+  }
+
+  const std::vector<std::string> & Parser::get_parsed_query(std::string const & query) const{
+      tokenizer(query);
+      normalizer();
+      stop_words_removal();
+      stemmer();
+      return parsed_doc;
   }
 
 }

@@ -43,7 +43,7 @@ namespace wunner
       } else {
           std::ifstream fin;
           fin.open(FILENAME, ios::in);
-          std::string key,;
+          std::string key;
           int length;
           ll doc_num, pos;
           while (!fin.eof()) {
@@ -54,10 +54,21 @@ namespace wunner
               }
           }
           fin.close();
+
+          fin.open(INDEXED_DOCS);
+          std::string word;
+          while (!fin.eof()) {
+              fin >> key >> length;
+              while (length--) {
+                  fin >> word;
+                  parsed_docs[key].push_back(word);
+              }
+          }
+          fin.close();
       }
   }
 
-  const std::vector<std::pair<std::string, std::vector<std::string>>> & Index::parse_docs() const
+  void Index::parse_docs() const
   {
       std::vector<std::pair<std::string, std::vector<std::string>>> parsed_docs;
       Parser p;
@@ -65,19 +76,29 @@ namespace wunner
       struct dirent *walk;
       if ((dir = opendir(CRAWLED))) {
           while ((walk = readdir(dir)) {
-              parsed_docs.push_back(p.get_parsed_document(walk->d_name));
+              auto & doc = p.get_parsed_document(walk->d_name);
+              parsed_docs[walk->d_name] = doc;
           }
           closedir(dir);
+          
+          // write the parsed documents list to a file
+          std::ofstream fout(INDEXED_DOCS);
+          for (auto & doc : parsed_docs) {
+              fout << doc.first << " " << doc.second.size() << " ";
+              for (auto & word : doc.second) {
+                  fout << word << " ";
+              }
+          }
+          fout.close();
       } else {
           throw std::exception("Directory containing crawled documents not present or corrupt");
       }
-      return parsed_docs;
   }
 
   void Index::build_index()
   {
-      auto parsed_docs = parse_docs();
-      for (auto & doc : parse_docs) {
+      parse_docs();
+      for (auto & doc : parsed_docs) {
           int pos = 0;
           for (auto & word : doc.second) {
               inverted_index[word].push_back(make_pair(doc.first, pos));
@@ -96,7 +117,12 @@ namespace wunner
       fout.close();
   }
 
-  const std::vector<std::pair<ll, ll>> & get_index(std::vector<std::string> const & word) const
+  const std::vector<std::string> & fetch_parsed_document(std::string const & doc_hash) const
+  {
+      return parsed_docs[doc_hash];
+  }
+
+  const std::vector<std::pair<ll, ll>> & get_index(std::string const & word) const
   {
       return inverted_index[word];
   }

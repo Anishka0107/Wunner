@@ -19,12 +19,17 @@
 #define CRAWLED "crawled_dir"
 #endif  // CRAWLED
 
+#ifndef INDEXED_DOCS
+#define INDEXED_DOCS "indexed_documents"
+#endif  // INDEXED_DOCS
+
 #ifndef BUILD_INVERTED_INDEX
 #define BUILD_INVERTED_INDEX
 
 #include <pair>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace wunner
 {
@@ -33,14 +38,17 @@ namespace wunner
       private:
           // timestamping
           std::unordered_map<std::string, std::vector<std::pair<ll, ll>>> inverted_index;
-          const std::vector<std::vector<std::string>> & parse_docs() const;
+          const std::unordered_map<std::string, std::vector<std::string>> parsed_docs;
+          void parse_docs() const;
           void build_index() const;
 
       public:
           Index();
           ~Index();
-          const std::vector<std::pair<ll, ll>> & get_index(std::vector<std::string> const &) const;
+          const std::vector<std::pair<ll, ll>> & get_index(std::string const &) const;
+          const std::vector<std::string> & fetch_parced_document(std::string const &) const;
   };
+
 }
 
 #endif  // BUILD_INVERTED_INDEX
