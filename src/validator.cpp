@@ -18,7 +18,7 @@ namespace wunner
       this->len = len;
 
       std::ifstream fin;
-      fin.exceptions(std::ifstream failbit | ifstream::badbit);
+      fin.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
       try {
           fin.open('word_list');
@@ -105,7 +105,7 @@ namespace wunner
       return dp[str1.length()][str2.length()];
   }
 
-  std::list<std::string> Validator::suggest(std::string const & word)
+  std::list<std::string> & Validator::suggest(std::string const & word)
   {
       std::list<std::string> suggestions;
       

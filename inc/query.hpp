@@ -29,7 +29,7 @@ namespace wunner
       public:
           Index i;
 
-          Query(std::string const &);
+          Query(std::string const &, Index &);
           ~Query();
           const std::set<std::string> & get_union_docs() const;
   };
@@ -49,7 +49,7 @@ namespace wunner
           // remove TD-IDF, add Okapi-BM25 as it performs better
 
       public:
-          QueryRanker(std::string const &, double, double);
+          QueryRanker(Query const &, double, double);
           std::vector<std::pair<int, std::string>> fetch_ranked_list();
   };
 

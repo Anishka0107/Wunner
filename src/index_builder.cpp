@@ -74,8 +74,8 @@ namespace wunner
       Parser p;
       DIR *dir;
       struct dirent *walk;
-      if ((dir = opendir(CRAWLED))) {
-          while ((walk = readdir(dir)) {
+      if (dir = opendir(CRAWLED)) {
+          while (walk = readdir(dir)) {
               auto & doc = p.get_parsed_document(walk->d_name);
               parsed_docs[walk->d_name] = doc;
           }

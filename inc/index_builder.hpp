@@ -8,7 +8,7 @@
 #define long long ll
 
 #ifndef MIN_DIFF
-#define MIN_DIFF 1000000
+#define MIN_DIFF 604800  // a week
 #endif  // MIN_DIFF
 
 #ifndef FILENAME
@@ -16,7 +16,7 @@
 #endif  // FILENAME
 
 #ifndef CRAWLED
-#define CRAWLED "crawled_dir"
+#define CRAWLED "../res/crawled_dir"
 #endif  // CRAWLED
 
 #ifndef INDEXED_DOCS
@@ -45,8 +45,8 @@ namespace wunner
       public:
           Index();
           ~Index();
-          const std::vector<std::pair<ll, ll>> & get_index(std::string const &) const;
-          const std::vector<std::string> & fetch_parced_document(std::string const &) const;
+          std::vector<std::pair<ll, ll>> & get_index(std::string const &) const;
+          std::vector<std::string> & fetch_parsed_document(std::string const &) const;
   };
 
 }

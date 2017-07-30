@@ -14,10 +14,11 @@
 
 namespace wunner
 {
-  Query::Query(std::string const & query)
+  Query::Query(std::string const & query, Index const & idx)
   {
       Parser p;
       processed_query = p.get_parsed_query(query);
+      i = idx;
   }
 
   const std::vector<std::string> const & Query::get_processed_query() const
@@ -36,9 +37,8 @@ namespace wunner
       return union_docs;
   }
   
-  QueryRanker::QueryRanker(std::string const & query, double k1 = 2.0, double b = 0.75)
+  QueryRanker::QueryRanker(Query const & q, double k1 = 2.0, double b = 0.75)
   {
-      Query q(query);
       std::set<std::string> docs = q.get_union_docs();
       for (auto & doc_name : docs) {
           auto & doc = q.i.fetch_parsed_document(doc_name);
@@ -80,7 +80,7 @@ namespace wunner
       return (tf * (k1 + 1)) / (tf + k1 * (1 - b + b * (doc_len / avg_doc_len)));
   }
 
-  std::vector<std::pair<int, std::string>> QueryRanker::fetch_ranked_list()
+  std::vector<std::pair<int, std::string>> & QueryRanker::fetch_ranked_list()
   {
       for (auto & doc : doc_info) {
           double doc_score = 0;
@@ -90,7 +90,7 @@ namespace wunner
               ll doc_len = doc.second.first;
               doc_score += get_IDF(doc_info.size(), f) * get_MFrac(tf, doc_len);
           }
-          ranked_docs.push_back(doc_score);
+          ranked_docs.push_back(std::make_pair(doc_score, doc.first));
       }
 
       return ranked_docs;
