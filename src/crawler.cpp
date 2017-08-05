@@ -10,7 +10,7 @@
 namespace wunner
 {
 
-  void Crawler::crawl()
+  void Crawler::crawl()         // remember to delete all stuff already crawled when this method is called
   {
       std::ifstream fin(CRAWL_SEED_SRC);
       while (!fin.eof()) {

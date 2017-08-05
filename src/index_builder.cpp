@@ -8,7 +8,6 @@
 #include <ctime>
 #include <fstream>
 
-#include <sys/stat.h>
 #include <dirent.h>
 
 #include "wunner/index_builder.hpp"
@@ -17,28 +16,9 @@
 namespace wunner
 {
 
-  Index::Index()
+  Index::Index(IndexInfo ii)
   {
-      std::time_t current_time = std::time(0);
-      struct stat res;
-      int last_modified_time_of_index, last_modified_time_of_crawled_docs;
-
-      if (!stat(FILENAME.c_str(), & res)) {
-          last_modified_time_of_index = res.st_mtime;
-      } else {
-          build_index();
-          continue;
-      }
-
-      if (!stat(CRAWLED.c_str(), & res)) {
-          last_modified_time_of_crawled_docs = res.st_mtime;
-      } else {
-          // since couldn't open crawled docs directory, throw exception
-          throw std::exception("Nothing to index, no directory containing crawled docs found!");
-      }
-
-      int time_diff = last_modified_time_of_crawled_docs - last_modified_time_of_index;
-      if (time_diff > 0 && current_time - time_diff > MIN_DIFF) {
+      if (ii == IndexInfo::BUILD_INDEX) {
           build_index();
       } else {
           std::ifstream fin;

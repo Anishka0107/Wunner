@@ -12,7 +12,7 @@
 #endif  // MIN_DIFF
 
 #ifndef FILENAME
-#define FILENAME "index_file"
+#define FILENAME "../res/index_file"
 #endif  // FILENAME
 
 #ifndef CRAWLED
@@ -20,7 +20,7 @@
 #endif  // CRAWLED
 
 #ifndef INDEXED_DOCS
-#define INDEXED_DOCS "indexed_documents"
+#define INDEXED_DOCS "../res/indexed_documents"
 #endif  // INDEXED_DOCS
 
 #ifndef BUILD_INVERTED_INDEX
@@ -33,6 +33,9 @@
 
 namespace wunner
 {
+
+  enum class IndexInfo = { BUILD_INDEX, READ_INDEX };
+
   class Index
   {
       private:
@@ -43,7 +46,7 @@ namespace wunner
           void build_index() const;
 
       public:
-          Index();
+          Index(IndexInfo);
           ~Index();
           std::vector<std::pair<ll, ll>> & get_index(std::string const &) const;
           std::vector<std::string> & fetch_parsed_document(std::string const &) const;

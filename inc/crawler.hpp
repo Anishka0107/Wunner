@@ -6,7 +6,7 @@
  */
 
 #ifndef CRAWLED
-#define CRAWLED "../res/crawled_docs"
+#define CRAWLED "../res/crawled_dir"
 #endif  // CRAWLED
 
 #ifndef CRAWLED_IDS
