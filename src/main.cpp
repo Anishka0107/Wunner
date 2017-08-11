@@ -1,11 +1,15 @@
-
-#define MAX_SUGGESTIONS 5
+/*
+ *
+ * Author : Anishka Gupta
+ * Created on : July 28, 2017
+ *
+ */
 
 #include <sys/stat.h>
 #include <thread>
 
-#include "wunner/crawler.hpp"
-#include "wunner/query.hpp"
+#include "../inc/crawler.hpp"
+#include "../inc/query.hpp"
 
 void search_for(Index & i, std::mutex & mutex, std::condition_variable & cv)
 {
@@ -17,7 +21,7 @@ void search_for(Index & i, std::mutex & mutex, std::condition_variable & cv)
         cv.wait(lock);
         Query q(query, index);
         std::vector<std::pair<int, std::string>> qr = QueryRanker(q);
-        std::vector<std::string> cpr = CombinedPageRank(qr);
+        std::vector<std::string> cpr = CombinedPageRank(qr);       // should output sorted list based on rank, and the strings should be document URLs, not hashes...
  
         if (cpr.empty()) {            // if even a single page is found, consider query valid, so no suggestions
             Validator validator;
@@ -44,16 +48,16 @@ void search_for(Index & i, std::mutex & mutex, std::condition_variable & cv)
 int main()
 {
     Crawler crawler;
-    Index index;
+    std::unique_ptr<Index> index;
 
     std::time_t current_time = std::time(0);
     struct stat res;
 
     if (!stat(CRAWLED.c_str(), & res) && (current_time - res.st_mtime < MIN_DIFF)) {
-        index = Index(IndexInfo::READ_INDEX);
+        index.reset(new Index(IndexInfo::READ_INDEX));
     } else {
         crawler.crawl();
-        index = Index(IndexInfo::BUILD_INDEX);
+        index.reset(new Index(IndexInfo::BUILD_INDEX));
     }
 
     std::mutex mutex;
@@ -73,9 +77,8 @@ int main()
             std::this_thread::sleep_for(duration);
         };
 
-    std::thread thread_for_search(search_for(index, mutex, cv));
+    std::thread thread_for_search(search_for(*index, mutex, cv));
     std::thread thread_for_refreshing_index(refresh_index(std::chrono::seconds(MIN_DIFF)));
-
 
     return 0;
 }

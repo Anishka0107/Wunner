@@ -26,7 +26,6 @@
 #ifndef BUILD_INVERTED_INDEX
 #define BUILD_INVERTED_INDEX
 
-#include <pair>
 #include <string>
 #include <unordered_map>
 #include <vector>

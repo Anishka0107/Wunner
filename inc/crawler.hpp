@@ -11,15 +11,11 @@
 
 #ifndef CRAWLED_IDS
 #define CRAWLED_IDS "../res/crawled_ids"
-#endif  // TEMP_CRAWLED
+#endif  // CRAWLED_IDS
 
 #ifndef CRAWL_NUM_PAGE
 #define CRAWL_NUM_PAGE 256
 #endif  // CRAWL_NUM_PAGE
-
-#ifndef MAX_CRAWL_DEPTH
-#define MAX_CRAWL_DEPTH 7
-#endif  // MAX_CRAWL_DEPTH
 
 #ifndef CRAWL_SEED_SRC
 #define CRAWL_SEED_SRC "../res/crawl_seed"
@@ -28,10 +24,8 @@
 #ifndef CRAWLER
 #define CRAWLER
 
-#include <set>
 #include <string>
-
-#include <curl/curl.h>
+#include <unordered_set>
 
 namespace wunner
 {
@@ -39,10 +33,11 @@ namespace wunner
   class Crawler
   {
       private:
-          std::set<std::string> seed_urls;
           std::unordered_set<std::string> visited;
 
       public:
+          const std::string & get_id(std::string const &);
+          void fetch_page_text(std::string const &, std::string const &) const;
           void crawl();
   };
 }

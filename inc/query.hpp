@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "wunner/index_builder.h"
+#include "index_builder.hpp"
 
 namespace wunner
 {

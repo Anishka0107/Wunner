@@ -5,6 +5,10 @@
  *
  */
 
+#ifndef MAX_SUGGESTIONS
+#ifndef MAX_SUGGESTIONS 7
+#endif  // MAX_SUGGESTIONS
+
 #ifndef WUNNER_VALIDATOR_HPP
 #define WUNNER_VALIDATOR_HPP
 
