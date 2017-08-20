@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <fstream>
 
-#include "wunner/validator.hpp"
+#include "validator.hpp"
 
 namespace wunner 
 {

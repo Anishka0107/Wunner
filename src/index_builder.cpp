@@ -10,8 +10,8 @@
 
 #include <dirent.h>
 
-#include "wunner/index_builder.hpp"
-#include "wunner/parser.hpp"
+#include "index_builder.hpp"
+#include "parser.hpp"
 
 namespace wunner
 {

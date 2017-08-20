@@ -10,15 +10,23 @@
 #include <boost/regex.hpp>
 #include <curl/curl.h>
 
-#include "wunner/crawler.hpp"
+#include "crawler.hpp"
 
 namespace wunner
 {
 
-  const std::string & Crawler::get_id(std::string const & url_name)
+  const std::string & Crawler::get_hash(std::string const & url_name)
   {
       size_t hash = std::hash<std::string>{}(url_name);
       return std::to_string(hash);
+  }
+
+  const std::string & Crawler::get_id(std::string const & url_name)
+  {
+      if (hashed.find(url_name) == hashed.end()) {
+          hashed[url_name] = get_hash(url_name);
+      }
+      return hashed[url_name];
   }
 
   void Crawler::fetch_page_text(std::string const & url, std::string const & page) const
@@ -52,6 +60,8 @@ namespace wunner
       int curr_crawl_page = 0;
       std::ofstream fout(CRAWLED_IDS);
 
+      PageRank pr;
+
       while (!urls.empty() && curr_crawl_page < CRAWL_NUM_PAGE) {
           std::string url = urls.front();
           urls.pop();
@@ -60,10 +70,10 @@ namespace wunner
               std::string page;
               fetch_page_text(url, page);
               std::string url_id = get_id(url);
-              fout << url_id << " " << url << endl;
+              fout << url_id << " " << url << " ";
 
               std::ofstream write_file(CRAWLED + "/" + url_id);
-              write_file << page;
+              write_file << page " ";
               write_file.close();
 
               const boost::regex link_expr("<a\s+(?:[^>]*?\s+)?href=([\"'])(.*?)\1");
@@ -71,6 +81,7 @@ namespace wunner
               auto start = page.begin();
               while (regex_search(start, page.end(), res, link_expr)) {
                   q.push(res[0]);
+                  pr.add_edge(get_id(res[0]), url_id);        // as we care about incoming links, add edges in opposite order
                   start = res[0].second;
               }
 
@@ -79,12 +90,49 @@ namespace wunner
           }
       }
       fout.close();
+
+      pr.calculate_ranks();
   }
 
   size_t write_data(char* buf, size_t size, size_t nmemb, void* userp)
   {
-      (std::string*(userp))->append(buf, size * nmemb);
+      (std::string* (userp))->append(buf, size * nmemb);
       return size * nmemb;
+  }
+
+  void PageRank::add_egde(std::string const & src, std::string const & dest)
+  {
+      adjlst[src].insert(dest);    
+  }
+
+  void PageRank::calculate_ranks()
+  {
+      const double damping_factor = 0.85;
+      double initial_page_rank = 1 / adj_lst.size();
+      std::map<std::string, std::pair<double, double>> rank_list;     // pair.first --> original rank, pair.second --> temporary rank
+      std::vector<double> temp_score(adj_lst.size(), initial_page_rank);
+      for (auto & node : adj_lst) {
+          rank_list.emplace(std::make_pair(node.first, initial_page_rank));
+      }
+
+      for (int i = 0; i < MAX_ITER_PAGE_RANK; i++) {
+          for (auto page : adj_lst) {
+              double pr = 1 - damping_factor;
+              for (auto & link : page.second) {
+                  pr += damping_factor * (rank_list[link].first / adj_lst[link].size());
+              }
+              rank_list[link].second = pr; 
+          }
+
+          for (auto & page_rank : rank_list) {
+              page_rank.first = page_rank.second;
+          }
+      }
+
+      for (auto & page_rank : rank_list) {
+          std::ofstream fout(PAGE_RANKS);
+          fout << page_rank.first << " " << page_rank.second << " ";
+      }
   }
 
 }

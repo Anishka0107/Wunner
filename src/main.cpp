@@ -5,13 +5,14 @@
  *
  */
 
+#include <iostream>
 #include <sys/stat.h>
 #include <thread>
 
-#include "../inc/crawler.hpp"
-#include "../inc/query.hpp"
+#include "crawler.hpp"
+#include "query.hpp"
 
-void search_for(Index & i, std::mutex & mutex, std::condition_variable & cv)
+void search_for(wunner::Index & i, std::mutex & mutex, std::condition_variable & cv)
 {
     while (true) {
         std::unique_lock<std::mutex> lock(mutex);
@@ -19,12 +20,13 @@ void search_for(Index & i, std::mutex & mutex, std::condition_variable & cv)
         std::cin >> query;
 
         cv.wait(lock);
-        Query q(query, index);
-        std::vector<std::pair<int, std::string>> qr = QueryRanker(q);
-        std::vector<std::string> cpr = CombinedPageRank(qr);       // should output sorted list based on rank, and the strings should be document URLs, not hashes...
+        wunner::Query q(query, i);
+        wunner::QueryRanker qr(q);
+        std::vector<std::pair<double, std::string>> rl = qr.fetch_ranked_list();
+        std::vector<std::string> cpr = wunner::CombinedPageRank(rl);       // should output sorted list based on rank, and the strings should be document URLs, not hashes...
  
         if (cpr.empty()) {            // if even a single page is found, consider query valid, so no suggestions
-            Validator validator;
+            wunner::Validator validator;
             std::vector<std::string> processed_query = q.get_processed_query();
             int count = 0;
             for (auto it = processed_query.begin(); it != processed_query.end(); it++) {
@@ -47,7 +49,7 @@ void search_for(Index & i, std::mutex & mutex, std::condition_variable & cv)
 
 int main()
 {
-    Crawler crawler;
+    wunner::Crawler crawler;
     std::unique_ptr<Index> index;
 
     std::time_t current_time = std::time(0);
@@ -66,7 +68,7 @@ int main()
     auto refresh_index = [&](auto duration)
         {
             crawler.crawl();
-            Index index_temp(IndexInfo::BUILD_INDEX);
+            wunner::Index index_temp(IndexInfo::BUILD_INDEX);
 
             std::unique_lock<std::mutex> lock(mutex);
 

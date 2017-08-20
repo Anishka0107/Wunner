@@ -50,7 +50,7 @@ namespace wunner
 
       public:
           QueryRanker(Query const &, double, double);
-          std::vector<std::pair<int, std::string>> fetch_ranked_list();
+          std::vector<std::pair<double, std::string>> fetch_ranked_list();
   };
 
 }

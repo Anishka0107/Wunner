@@ -12,8 +12,8 @@
 #include <unordered_map>
 #include <boost/tokenizer.hpp>
 
-#include "wunner/parser.hpp"
-#include "wunner/PorterStemmer.h"
+#include "parser.hpp"
+#include "PorterStemmer.h"
 
 namespace wunner
 {

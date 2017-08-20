@@ -5,7 +5,7 @@
  *
  */
 
-#define long long ll
+#define ll long long
 
 #ifndef MIN_DIFF
 #define MIN_DIFF 604800  // a week
@@ -33,7 +33,7 @@
 namespace wunner
 {
 
-  enum class IndexInfo = { BUILD_INDEX, READ_INDEX };
+  enum class IndexInfo { BUILD_INDEX, READ_INDEX };
 
   class Index
   {
