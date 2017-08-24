@@ -104,7 +104,8 @@ namespace wunner
       return std::make_pair(document, parsed_doc);
   }
 
-  const std::vector<std::string> & Parser::get_parsed_query(std::string const & query) const{
+  const std::vector<std::string> & Parser::get_parsed_query(std::string const & query) const
+  {
       tokenizer(query);
       normalizer();
       stop_words_removal();

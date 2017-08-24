@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 #include <thread>
 
-#include "crawler.hpp"
 #include "query.hpp"
 
 void search_for(wunner::Index & i, std::mutex & mutex, std::condition_variable & cv)
@@ -22,15 +21,16 @@ void search_for(wunner::Index & i, std::mutex & mutex, std::condition_variable &
         cv.wait(lock);
         wunner::Query q(query, i);
         wunner::QueryRanker qr(q);
-        std::vector<std::pair<double, std::string>> rl = qr.fetch_ranked_list();
-        std::vector<std::string> cpr = wunner::CombinedPageRank(rl);       // should output sorted list based on rank, and the strings should be document URLs, not hashes...
+        auto rl = qr.fetch_ranked_list();
+        wunner::CombinedPageRank cpr(rl);
+        auto cpr_list = cpr.get_final_ranked_list();       // should output sorted list based on rank, and the strings should be document URLs, not hashes...
  
-        if (cpr.empty()) {            // if even a single page is found, consider query valid, so no suggestions
+        if (cpr_list.empty()) {            // if even a single page is found, consider query valid, so no suggestions
             wunner::Validator validator;
-            std::vector<std::string> processed_query = q.get_processed_query();
+            auto processed_query = q.get_processed_query();
             int count = 0;
             for (auto it = processed_query.begin(); it != processed_query.end(); it++) {
-                std::list<std::string> suggestions = validator.suggest(word);
+                auto suggestions = validator.suggest(word);
                 for (auto & suggestion : suggestions) {
                     std::cout << "By " << word << ", did you mean " << suggestion;
                     if (++count > MAX_SUGGESTIONS) {
@@ -39,10 +39,11 @@ void search_for(wunner::Index & i, std::mutex & mutex, std::condition_variable &
                     }
                 }
             }
+            return;
         }
 
-        for (auto & page : cpr) {
-            std::cout << crawler.get_page_url(page) << std::endl;
+        for (auto & page : cpr_list) {
+            std::cout << page << std::endl;
         }
     }
 }

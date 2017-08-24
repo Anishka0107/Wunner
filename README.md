@@ -7,7 +7,8 @@ Development started, don't test it, doesn't work as of now
 TODO checklist:
 
 |* Add support for complete matching queries
-|* Calculate final combined rank based on harmonic mean or weighted sum of page rank & query dependent rank
+|* Reduce number of files used, prefer to keep things in memory wherever possible, think of database
+|* Resolve dependencies
 |* Implement interaction with robots.txt in crawler
 |* Implement autocomplete
 |* Build web UI

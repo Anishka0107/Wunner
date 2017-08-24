@@ -53,6 +53,15 @@ namespace wunner
           std::vector<std::pair<double, std::string>> fetch_ranked_list();
   };
 
+  class CombinedPageRank
+  {
+      private:
+          std::vector<std::string> final_ranked_list;
+
+      public:
+          CombinedPageRank(std::vector<std::pair<double, std::string>> &);
+          std::vector<std::string> & get_final_ranked_list();
+  }
 }
 
 #endif  // QUERY_PROCESSOR

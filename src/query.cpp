@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "crawler.hpp"
 #include "query.hpp"
 
 namespace wunner
@@ -94,6 +95,73 @@ namespace wunner
       }
 
       return ranked_docs;
+  }
+
+  CombinedPageRank::CombinedPageRank(std::vector<std::pair<double, std::string>> & ranked_list)
+  {
+      std::ifstream fin(PAGE_RANKS);
+      std::unordered_map<std::string, double> page_ranks;
+      bool use_page_rank = true;
+
+      if (!fin) {
+          std::cerr << "Page ranks not computed or file missing/corrupted! Using fallback query based ranks";
+          use_page_rank = false;
+      }
+
+      while (fin) {
+          std::string page, rank;
+          fin >> page >> rank;
+          try {
+              page_ranks[page] = std::stod(rank);    // ideally, no exceptions would occur
+          } catch (std::invalid_argument | std::out_of_range) {        // case when file is edited or corrupted
+              std::cerr << "Warning: Page rank file content modified! Using fallback query based ranks";
+              use_page_rank = false;
+          }
+      }
+      fin.close();
+
+      if (use_page_rank) {
+          for (auto & bm25_ranked : ranked_list) {
+              double par1 = bm25_ranked.first;
+              double par2 = page_ranks[bm25_ranked.second];    // use index directly, expected to be present in map
+              bm25_ranked.first = (par1 * par2) / (par1 + par2);      // harmonic mean
+          }
+      }
+
+      sort(ranked_list.begin(), ranked_list.end(), sort_comparator);
+
+      fin.open(CRAWLED_IDS);
+
+      if (!fin) {
+          throw std::exception("Error! Cannot find crawled docs IDs!");
+      }
+
+      std::unordered_map<std::string, std::string> url_map;
+      while (fin) {
+          std::string url_id, url;
+          fin >> url_id >> url;
+          url_map[url_id] = url;
+      }
+      fin.close();
+
+      for (auto & ranked : ranked_list) {            // show all results; later on if size grows, can add functionality to omit few last urls
+          auto iter = url_map.find(ranked.second);
+          if (iter == url_map.end()) {
+              throw std::exception("Page ID to URL mapping not found! Error in crawled doc IDs");
+          }
+          final_ranked_list.push_back(iter->second);
+      }
+  }
+
+  std::vector<std::string> & CombinedPageRank::get_final_ranked_list()
+  {
+      return final_ranked_list;
+  }
+
+  // TODO: better use templates and merge with comparator of Validator
+  bool sort_comparator(const std::pair<double, std::string> &p1, const std::pair<double, std::string> &p2)
+  {
+      return p1.first > p2.first;
   }
 
 }

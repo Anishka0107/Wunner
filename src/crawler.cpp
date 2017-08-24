@@ -124,14 +124,14 @@ namespace wunner
               rank_list[link].second = pr; 
           }
 
-          for (auto & page_rank : rank_list) {
+          for (auto & page_rank : rank_list.second) {
               page_rank.first = page_rank.second;
           }
       }
 
       for (auto & page_rank : rank_list) {
           std::ofstream fout(PAGE_RANKS);
-          fout << page_rank.first << " " << page_rank.second << " ";
+          fout << page_rank.first << " " << page_rank.second.first << " ";
       }
   }
 
