@@ -22,7 +22,7 @@ namespace wunner
       i = idx;
   }
 
-  const std::vector<std::string> const & Query::get_processed_query() const
+  const std::vector<std::string> & Query::get_processed_query() const
   {
       return processed_query;
   }
@@ -38,7 +38,9 @@ namespace wunner
       return union_docs;
   }
   
-  QueryRanker::QueryRanker(Query const & q, double k1 = 2.0, double b = 0.75)
+  QueryRanker::QueryRanker(Query const & q) : QueryRanker(q, 2.0, 0.75) {}
+  
+  QueryRanker::QueryRanker(Query const & q, double k1, double b)
   {
       std::set<std::string> docs = q.get_union_docs();
       for (auto & doc_name : docs) {

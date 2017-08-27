@@ -30,6 +30,7 @@ namespace wunner
           Index i;
 
           Query(std::string const &, Index &);
+          const std::vector<std::string> & get_processed_query() const;
           const std::set<std::string> & get_union_docs() const;
   };
 
@@ -48,6 +49,7 @@ namespace wunner
           // remove TD-IDF, add Okapi-BM25 as it performs better
 
       public:
+          QueryRanker(Query const &);
           QueryRanker(Query const &, double, double);
           std::vector<std::pair<double, std::string>> fetch_ranked_list();
   };
@@ -60,7 +62,7 @@ namespace wunner
       public:
           CombinedPageRank(std::vector<std::pair<double, std::string>> &);
           std::vector<std::string> & get_final_ranked_list();
-  }
+  };
 }
 
 #endif  // QUERY_PROCESSOR

@@ -16,7 +16,6 @@
 #ifndef PARSER
 #define PARSER
 
-#include <pair>
 #include <string>
 #include <unordered_set>
 #include <vector>

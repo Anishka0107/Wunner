@@ -35,6 +35,7 @@
 #include <string>
 #include <set>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace wunner
 {
@@ -46,8 +47,8 @@ namespace wunner
           std::unordered_map<std::string, std::string> hashed;
 
       public:
-          const std::string & get_id(std::string const &);
-          const std::string & get_hash(std::string const &);
+          std::string get_id(std::string const &);
+          std::string get_hash(std::string const &);
           void fetch_page_text(std::string const &, std::string const &) const;
           void crawl();
   };
@@ -58,7 +59,7 @@ namespace wunner
           std::unordered_map<std::string, std::set<std::string>> adj_lst;       // the graph is expected to be sparse, hence using adjacency list
 
       public:
-          void add_egde(std::string const &, std::string const &);
+          void add_edge(std::string const &, std::string const &);
           void calculate_ranks();
   };
 

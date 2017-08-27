@@ -13,7 +13,9 @@
 namespace wunner 
 {
 
-  Validator::Validator(int len = 2)
+  Validator::Validator() : Validator(2) {}
+
+  Validator::Validator(int len)
   {
       this->len = len;
 
@@ -45,11 +47,6 @@ namespace wunner
       } catch (...) {
           // do not throw error if it doesn't exist or is corrupt
       }
-  }
-
-  Validator::~Validator()
-  {
-
   }
 
   void Validator::generate_n_grams(std::string const & word)

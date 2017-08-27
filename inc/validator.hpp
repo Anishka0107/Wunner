@@ -6,17 +6,15 @@
  */
 
 #ifndef MAX_SUGGESTIONS
-#ifndef MAX_SUGGESTIONS 7
+#define MAX_SUGGESTIONS 7
 #endif  // MAX_SUGGESTIONS
 
 #ifndef WUNNER_VALIDATOR_HPP
 #define WUNNER_VALIDATOR_HPP
 
 #include <list>
-#include <pair>
 #include <string>
 #include <unordered_map>
-#include <unordered_multimap>
 #include <unordered_set>
 #include <vector>
 
@@ -34,8 +32,8 @@ namespace wunner
           int compare_strings(std::string const &, std::string const &) const;
 
       public:
+          Validator();
           Validator(int);
-          ~Validator();
           std::list<std::string> suggest(std::string const &) const;
   };
 

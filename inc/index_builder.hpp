@@ -39,16 +39,15 @@ namespace wunner
   {
       private:
           // timestamping
-          std::unordered_map<std::string, std::vector<std::pair<ll, ll>>> inverted_index;
-          const std::unordered_map<std::string, std::vector<std::string>> parsed_docs;
+          std::unordered_map<std::string, std::vector<std::pair<std::string, ll>>> inverted_index;
+          std::unordered_map<std::string, std::vector<std::string>> parsed_docs;
           void parse_docs() const;
-          void build_index() const;
+          void build_index();
 
       public:
           Index(IndexInfo);
-          ~Index();
-          std::vector<std::pair<ll, ll>> & get_index(std::string const &) const;
-          std::vector<std::string> & fetch_parsed_document(std::string const &) const;
+          std::vector<std::string> & fetch_parsed_document(std::string const &);
+          std::vector<std::pair<std::string, ll>> & get_index(std::string const &);
   };
 
 }

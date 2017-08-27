@@ -36,7 +36,12 @@ namespace wunner
       curr->is_leaf = true;
   }
 
-  bool Trie::remove(std::string const & outdated_query, Node* curr = this->root, int curr_depth = 0)
+  bool Trie::remove(std::string const & outdated_query)
+  {
+      return remove(outdated_query, root, 0);
+  }
+
+  bool Trie::remove(std::string const & outdated_query, Node* curr, size_t curr_depth)
   {
       if (curr != NULL) {
           if (curr_depth == outdated_query.length()) {
@@ -66,10 +71,12 @@ namespace wunner
       return false;
   }
 
-  std::vector<std::string> Trie::search(std::string const & prefix)  // expect RVO, so while getting value in caller function, don't use const reference
+  std::vector<std::string> Trie::search(std::string const & prefix) // expect RVO, so while getting value in caller function, don't use const reference
   {
       Node* curr = root;
-      for (int i = 0; i < prefix.length(); i++) {
+      std::vector<std::string> results;
+
+      for (size_t i = 0; i < prefix.length(); i++) {
           int index = (int)prefix[i] - ASCII_START_CODE;
           if (curr->children[index] == NULL) {
               return results;
@@ -78,9 +85,8 @@ namespace wunner
       }
 
       std::string copied_prefix = prefix;
-      std::vector<std::string> results;
-      get_all_children(curr, prefix, results);
- 
+      get_all_children(curr, copied_prefix, results);
+      return results;
   }
 
   void Trie::get_all_children(Node* root, std::string & prefix, std::vector<std::string> & results)
@@ -95,7 +101,7 @@ namespace wunner
           if (root->children[i]) {
               char next = i + ASCII_START_CODE;
               prefix.push_back(next);
-              traverse(root->children[i], prefix, results);
+              get_all_children(root->children[i], prefix, results);
               prefix.pop_back();
           }
       }

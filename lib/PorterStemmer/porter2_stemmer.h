@@ -32,7 +32,6 @@
 
 #include <vector>
 #include <string>
-#include "util/string_view.h"
 
 namespace Porter2Stemmer
 {
@@ -74,12 +73,12 @@ bool isVowel(char ch);
 
 bool isVowelY(char ch);
 
-bool endsWith(meta::util::string_view word, meta::util::string_view str);
+bool endsWith(const std::string& word, const std::string& str);
 
 bool endsInDouble(const std::string& word);
 
-bool replaceIfExists(std::string& word, meta::util::string_view suffix,
-                     meta::util::string_view replacement, size_t start);
+bool replaceIfExists(std::string& word, const std::string& suffix,
+                     const std::string& replacement, size_t start);
 
 bool isValidLIEnding(char ch);
 

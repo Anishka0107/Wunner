@@ -22,10 +22,10 @@ namespace wunner
           build_index();
       } else {
           std::ifstream fin;
-          fin.open(FILENAME, ios::in);
-          std::string key;
+          fin.open(FILENAME, std::ios::in);
+          std::string key, doc_num;
           int length;
-          ll doc_num, pos;
+          ll pos;
           while (!fin.eof()) {
               fin >> key >> length;
               while (length--) {
@@ -71,7 +71,7 @@ namespace wunner
           }
           fout.close();
       } else {
-          throw std::exception("Directory containing crawled documents not present or corrupt");
+          throw std::runtime_error("Directory containing crawled documents not present or corrupt");
       }
   }
 
@@ -86,7 +86,7 @@ namespace wunner
           }
       }
       std::ofstream fout;
-      fout.open(FILENAME, ios::out);
+      fout.open(FILENAME, std::ios::out);
       // Serializing the index and storing it to a file for further reference
       for (auto & word_info : inverted_index) {
           fout << word_info.first << " " << word_info.second.size() << " ";
@@ -97,12 +97,12 @@ namespace wunner
       fout.close();
   }
 
-  const std::vector<std::string> & fetch_parsed_document(std::string const & doc_hash) const
+  std::vector<std::string> & Index::fetch_parsed_document(std::string const & doc_hash)
   {
       return parsed_docs[doc_hash];
   }
 
-  const std::vector<std::pair<ll, ll>> & get_index(std::string const & word) const
+  std::vector<std::pair<std::string, ll>> & Index::get_index(std::string const & word)
   {
       return inverted_index[word];
   }

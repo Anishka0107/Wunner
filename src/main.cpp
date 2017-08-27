@@ -5,14 +5,18 @@
  *
  */
 
+#include <condition_variable>
 #include <iostream>
+#include <mutex>
 #include <sys/stat.h>
 #include <thread>
 
 #include "autocomplete.hpp"
+#include "crawler.hpp"
 #include "query.hpp"
+#include "validator.hpp"
 
-void search_for(wunner::Index & i, wunner::Autocomplete & autocomplete, std::mutex & mutex, std::condition_variable & cv)
+void search_for(wunner::Index *index, wunner::Autocomplete & autocomplete, std::mutex & mutex, std::condition_variable & cv)
 {
     while (true) {
         std::unique_lock<std::mutex> lock(mutex);
@@ -25,12 +29,12 @@ void search_for(wunner::Index & i, wunner::Autocomplete & autocomplete, std::mut
                 std::cout << "No results found! Searching for the above query itself...";
                 break;
             }
-            for (int i = 0; i < query_list.size(); i++) {                     // shows a maximum of 10 suggestions numbered 0-9
+            for (size_t i = 0; i < query_list.size(); i++) {                     // shows a maximum of 10 suggestions numbered 0-9
                 std::cout << i << ". " << query_list[i] << std::endl;
             }
-            int choice;
+            size_t choice;
             std::cin >> choice;
-            if (choice >= 0 && choice < query_list.size()) {
+            if (choice < query_list.size()) {
                 query += query_list[choice];
                 std::cout << query;
                 std::string remaining_query;
@@ -44,7 +48,7 @@ void search_for(wunner::Index & i, wunner::Autocomplete & autocomplete, std::mut
 
         cv.wait(lock);
         autocomplete.submit_new_query(query);
-        wunner::Query q(query, i);
+        wunner::Query q(query, *index);
         wunner::QueryRanker qr(q);
         auto rl = qr.fetch_ranked_list();
         wunner::CombinedPageRank cpr(rl);
@@ -55,9 +59,9 @@ void search_for(wunner::Index & i, wunner::Autocomplete & autocomplete, std::mut
             auto processed_query = q.get_processed_query();
             int count = 0;
             for (auto it = processed_query.begin(); it != processed_query.end(); it++) {
-                auto suggestions = validator.suggest(word);
+                auto suggestions = validator.suggest(*it);
                 for (auto & suggestion : suggestions) {
-                    std::cout << "By " << word << ", did you mean " << suggestion;
+                    std::cout << "By " << *it << ", did you mean " << suggestion;
                     if (++count > MAX_SUGGESTIONS) {
                         it = processed_query.end() - 1;
                         break;
@@ -76,17 +80,17 @@ void search_for(wunner::Index & i, wunner::Autocomplete & autocomplete, std::mut
 int main()
 {
     wunner::Crawler crawler;
-    std::unique_ptr<Index> index;
+    wunner::Index *index;
     wunner::Autocomplete autocomplete;
 
     std::time_t current_time = std::time(0);
     struct stat res;
 
-    if (!stat(CRAWLED.c_str(), & res) && (current_time - res.st_mtime < MIN_DIFF)) {
-        index.reset(new Index(IndexInfo::READ_INDEX));
+    if (!stat(CRAWLED, & res) && (current_time - res.st_mtime < MIN_DIFF)) {
+        index = new wunner::Index(wunner::IndexInfo::READ_INDEX);
     } else {
         crawler.crawl();
-        index.reset(new Index(IndexInfo::BUILD_INDEX));
+        index = new wunner::Index(wunner::IndexInfo::BUILD_INDEX);
     }
 
     std::mutex mutex;
@@ -95,19 +99,19 @@ int main()
     auto refresh_index = [&](auto duration)
         {
             crawler.crawl();
-            wunner::Index index_temp(IndexInfo::BUILD_INDEX);
+            wunner::Index *index_temp = new wunner::Index(wunner::IndexInfo::BUILD_INDEX);
 
             std::unique_lock<std::mutex> lock(mutex);
 
-            ii.~Index();
-            ii = index_temp;          // shallow copy
+            delete index;
+            index = index_temp;
 
             cv.notify_all();
             std::this_thread::sleep_for(duration);
         };
 
-    std::thread thread_for_search(search_for(*index, autocomplete, mutex, cv));
-    std::thread thread_for_refreshing_index(refresh_index(std::chrono::seconds(MIN_DIFF)));
+    std::thread thread_for_search(& search_for, index, std::ref(autocomplete), std::ref(mutex), std::ref(cv));
+    std::thread thread_for_refreshing_index(refresh_index, std::chrono::seconds(MIN_DIFF));
 
     return 0;
 }

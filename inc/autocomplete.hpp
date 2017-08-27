@@ -51,7 +51,8 @@ namespace wunner
       public:
           Trie();
           void insert(std::string const &);
-          bool remove(std::string const &, Node*, int);
+          bool remove(std::string const &);
+          bool remove(std::string const &, Node*, size_t);
           std::vector<std::string> search(std::string const &);      // should return a maximum of MAX_RESULTS results
           void get_all_children(Node*, std::string &, std::vector<std::string> &);
   };
