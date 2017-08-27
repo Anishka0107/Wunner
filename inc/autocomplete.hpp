@@ -24,6 +24,7 @@
 #ifndef AUTOCOMPLETE
 #define AUTOCOMPLETE
 
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -60,10 +61,9 @@ namespace wunner
       // no files here to store old queries, as it is trivial
       private:
           Trie trie;
-          Queue submitted_queries;
+          std::queue<std::string> submitted_queries;
 
       public:
-          Autocomplete();
           void submit_new_query(std::string const &);
           std::vector<std::string> search_for(std::string const &);
   };

@@ -101,19 +101,19 @@ namespace wunner
       }
   }
 
-  Autocomplete::Autocomplete()
-  {
-      
-  }
-
   void Autocomplete::submit_new_query(std::string const & query)
   {
-
+      if (submitted_queries.size() >= MAX_QUERIES) {
+          trie.remove(submitted_queries.front());
+          submitted_queries.pop();
+      }
+      trie.insert(query);
+      submitted_queries.push(query);
   }
 
-  const std::vector<std::string> & Autocomplete::search_for(std::string const & prefix_query)
+  std::vector<std::string> Autocomplete::search_for(std::string const & prefix_query)
   {
-
+      return trie.search(prefix_query);
   }
 
 }
