@@ -30,7 +30,6 @@ namespace wunner
           Index i;
 
           Query(std::string const &, Index &);
-          ~Query();
           const std::set<std::string> & get_union_docs() const;
   };
 
