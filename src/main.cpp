@@ -77,7 +77,7 @@ void search_for(wunner::Index *index, wunner::Autocomplete & autocomplete, std::
     }
 }
 
-int main()
+int main(int argc, char** argv)
 {
     wunner::Crawler crawler;
     wunner::Index *index;

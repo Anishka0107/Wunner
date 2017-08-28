@@ -49,7 +49,7 @@ namespace wunner
       public:
           std::string get_id(std::string const &);
           std::string get_hash(std::string const &);
-          void fetch_page_text(std::string const &, std::string const &) const;
+          int fetch_page_text(std::string const &, std::string const &) const;
           void crawl();
   };
 
