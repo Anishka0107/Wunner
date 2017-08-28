@@ -13,14 +13,14 @@
 #include <boost/tokenizer.hpp>
 
 #include "parser.hpp"
-#include "PorterStemmer.h"
+#include "PorterStemmer/porter2_stemmer.h"
 
 namespace wunner
 {
 
   Parser::Parser()
   {
-      ifstream fin(STOPPER);
+      std::ifstream fin(STOPPER);
       if (fin) {
           std::string stop_word;
           while (!fin.eof()) {
@@ -32,7 +32,7 @@ namespace wunner
       }
   }
   
-  void Parser::tokenizer(std::string const & document) const
+  void Parser::tokenizer(std::string const & document)
   {
       boost::char_separator<char> sep(",.@|-\"\"\'\' \n");
       std::ifstream fin("../" + document);
@@ -41,7 +41,7 @@ namespace wunner
           buf << fin.rdbuf();
           std::string doc = buf.str();
           boost::tokenizer<boost::char_separator<char>> tokens(doc, sep);
-          for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it) {
+          for (auto it = tokens.begin(); it != tokens.end(); ++it) {
               parsed_doc.push_back(*it);
           }
           fin.close();
@@ -51,16 +51,16 @@ namespace wunner
       }
   }
 
-  void Parser::query_tokenizer(std::string const & query) const
+  void Parser::query_tokenizer(std::string const & query)
   {
       boost::char_separator<char> sep(",.@|-\"\"\'\' \n");
       boost::tokenizer<boost::char_separator<char>> tokens(query, sep);
-      for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it) {
+      for (auto it = tokens.begin(); it != tokens.end(); ++it) {
           parsed_doc.push_back(*it);
       }
   }
 
-  void Parser::normalizer() const
+  void Parser::normalizer()
   {
       for (auto & word : parsed_doc) {
            std::transform(word.begin(), word.end(), word.begin(), ::tolower);
@@ -69,14 +69,14 @@ namespace wunner
 
   void Parser::stop_words_removal()
   {
-      parsed_doc(std::remove_if(parsed_doc.begin(), parsed_doc.end(),
-                                [](std::string w) {
-                                    if (stop_words.find(w) == stop_words.end()) {
-                                        return false;
-                                    } else {
-                                        return true;
-                                    }
-                                }, parsed_doc.end());
+      parsed_doc.erase(std::remove_if(parsed_doc.begin(), parsed_doc.end(),
+                                         [&](std::string const & w) {
+                                             if (stop_words.find(w) == stop_words.end()) {
+                                                 return false;
+                                             } else {
+                                                 return true;
+                                             }
+                                     }), parsed_doc.end());
   }
 
   void Parser::stemmer()
@@ -84,27 +84,26 @@ namespace wunner
       std::unordered_map<std::string, std::string> yet_stemmed;
       for (auto & word : parsed_doc) {
           if (yet_stemmed.find(word) == yet_stemmed.end()) {
-              std::pair stemmed = std::make_pair(word, "");
+              std::string orig_word = word;
               Porter2Stemmer::stem(word);
-              stemmed.second = word;        // stemmed in place
-              unordered_map.insert(stemmed);
+              yet_stemmed[orig_word] = word;
           } else {
               word = yet_stemmed[word];
           }
       }
   }
 
-  const std::pair<std::string, std::vector<std::string>> & Parser::get_parsed_document(std::string const & document) const
+  std::vector<std::string> Parser::get_parsed_document(std::string const & document)
   {
       parsed_doc.clear();
       tokenizer(document);
       normalizer();
       stop_words_removal();
       stemmer();
-      return std::make_pair(document, parsed_doc);
+      return parsed_doc;
   }
 
-  const std::vector<std::string> & Parser::get_parsed_query(std::string const & query) const
+  const std::vector<std::string> & Parser::get_parsed_query(std::string const & query) 
   {
       tokenizer(query);
       normalizer();

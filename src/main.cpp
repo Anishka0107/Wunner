@@ -48,7 +48,7 @@ void search_for(wunner::Index *index, wunner::Autocomplete & autocomplete, std::
 
         cv.wait(lock);
         autocomplete.submit_new_query(query);
-        wunner::Query q(query, *index);
+        wunner::Query q(query, index);
         wunner::QueryRanker qr(q);
         auto rl = qr.fetch_ranked_list();
         wunner::CombinedPageRank cpr(rl);

@@ -28,17 +28,17 @@ namespace wunner
           std::vector<std::string> parsed_doc;
           std::unordered_set<std::string> stop_words;
 
-          void tokenizer(std::string const &) const;
-          void query_tokenizer(std::string const &) const;
-          void normalizer() const;
-          void stop_words_removal() const;
-          void stemmer() const;
+          void tokenizer(std::string const &);
+          void query_tokenizer(std::string const &);
+          void normalizer();
+          void stop_words_removal();
+          void stemmer();
 
       public:
           Parser();
           ~Parser();
-          const std::pair<std::string, std::vector<std::string>> & get_parsed_document(std::string const &) const;
-          const std::vector<std::string> & get_parsed_query(std::string const &) const;
+          std::vector<std::string> get_parsed_document(std::string const &);
+          const std::vector<std::string> & get_parsed_query(std::string const &);
   };
 }
 

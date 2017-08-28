@@ -27,17 +27,17 @@ namespace wunner
           std::set<std::string> union_docs;
       
       public:
-          Index i;
+          Index *i;
 
-          Query(std::string const &, Index &);
+          Query(std::string const &, Index*);
           const std::vector<std::string> & get_processed_query() const;
-          const std::set<std::string> & get_union_docs() const;
+          const std::set<std::string> & get_union_docs();
   };
 
   class QueryRanker
   {
       private:
-          std::vector<std::pair<int, std::string>> ranked_docs;    // the int indicates the weight of the doc
+          std::vector<std::pair<double, std::string>> ranked_docs;    // the double indicates the weight of the doc
           std::map<std::string, std::pair<int, std::vector<int>>> doc_info;  // needed for BM25 calculation
           std::vector<ll> all_freq;        // frequency of query words in bag of words
           double avg_doc_len;
@@ -49,8 +49,8 @@ namespace wunner
           // remove TD-IDF, add Okapi-BM25 as it performs better
 
       public:
-          QueryRanker(Query const &);
-          QueryRanker(Query const &, double, double);
+          QueryRanker(Query &);
+          QueryRanker(Query &, double, double);
           std::vector<std::pair<double, std::string>> fetch_ranked_list();
   };
 

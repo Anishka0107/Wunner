@@ -52,12 +52,12 @@ namespace wunner
   {
       std::vector<std::pair<std::string, std::vector<std::string>>> parsed_docs;
       Parser p;
-      DIR *dir;
+      DIR *dir = opendir(CRAWLED);
       struct dirent *walk;
-      if (dir = opendir(CRAWLED)) {
-          while (walk = readdir(dir)) {
-              auto & doc = p.get_parsed_document(walk->d_name);
-              parsed_docs[walk->d_name] = doc;
+      if (dir) {
+          while ((walk = readdir(dir)) != NULL) {
+              auto doc = p.get_parsed_document(walk->d_name);
+              parsed_docs.push_back(std::make_pair(walk->d_name, doc));
           }
           closedir(dir);
           

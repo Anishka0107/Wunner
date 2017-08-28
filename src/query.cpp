@@ -5,17 +5,25 @@
  *
  */
 
-#define long long ll
-
 #include <algorithm>
 #include <cmath>
+#include <fstream>
+#include <iostream>
 
 #include "crawler.hpp"
+#include "parser.hpp"
 #include "query.hpp"
 
 namespace wunner
 {
-  Query::Query(std::string const & query, Index const & idx)
+
+  // TODO: better use templates and merge with comparator of Validator
+  bool sort_comparator(const std::pair<double, std::string> &p1, const std::pair<double, std::string> &p2)
+  {
+      return p1.first > p2.first;
+  }
+
+  Query::Query(std::string const & query, Index *idx)
   {
       Parser p;
       processed_query = p.get_parsed_query(query);
@@ -27,26 +35,26 @@ namespace wunner
       return processed_query;
   }
 
-  const std::set<std::string> & Query::get_union_docs() const
+  const std::set<std::string> & Query::get_union_docs()
   {
       // returns a set of all those documents which contain the occurence of even one word from the parsed query
       for (auto & word : processed_query) {
-          for (auto & res : i.get_index(word)) {
-              union_docs.push_back(res.first);
+          for (auto & res : (*i).get_index(word)) {
+              union_docs.insert(res.first);
           }
       }
       return union_docs;
   }
   
-  QueryRanker::QueryRanker(Query const & q) : QueryRanker(q, 2.0, 0.75) {}
+  QueryRanker::QueryRanker(Query & q) : QueryRanker(q, 2.0, 0.75) {}
   
-  QueryRanker::QueryRanker(Query const & q, double k1, double b)
+  QueryRanker::QueryRanker(Query & q, double k1, double b)
   {
       std::set<std::string> docs = q.get_union_docs();
       for (auto & doc_name : docs) {
-          auto & doc = q.i.fetch_parsed_document(doc_name);
+          auto & doc = q.i->fetch_parsed_document(doc_name);
           doc_info[doc_name].first = doc.size();
-          for (word : q.get_processed_query()) {
+          for (auto & word : q.get_processed_query()) {
               doc_info[doc_name].second.push_back(std::count(doc.begin(), doc.end(), word));
           }
       }
@@ -59,7 +67,7 @@ namespace wunner
       this->k1 = k1;
       this->b = b;
 
-      for (int j = 0; j < q.get_processed_query.size(); j++) {
+      for (size_t j = 0; j < q.get_processed_query().size(); j++) {
           ll f = 0;
           for (auto & doc : doc_info) {
               if (doc.second.second[j]) {
@@ -83,11 +91,11 @@ namespace wunner
       return (tf * (k1 + 1)) / (tf + k1 * (1 - b + b * (doc_len / avg_doc_len)));
   }
 
-  std::vector<std::pair<int, std::string>> & QueryRanker::fetch_ranked_list()
+  std::vector<std::pair<double, std::string>> QueryRanker::fetch_ranked_list()
   {
       for (auto & doc : doc_info) {
           double doc_score = 0;
-          for (auto j = 0; j < doc.second.second.size(); j++) {
+          for (size_t j = 0; j < doc.second.second.size(); j++) {
               double tf = double(doc.second.second[j]);
               double f = double(all_freq[j]);
               ll doc_len = doc.second.first;
@@ -115,7 +123,7 @@ namespace wunner
           fin >> page >> rank;
           try {
               page_ranks[page] = std::stod(rank);    // ideally, no exceptions would occur
-          } catch (std::invalid_argument | std::out_of_range) {        // case when file is edited or corrupted
+          } catch (std::exception & ex) {        // case when file is edited or corrupted
               std::cerr << "Warning: Page rank file content modified! Using fallback query based ranks";
               use_page_rank = false;
           }
@@ -135,7 +143,7 @@ namespace wunner
       fin.open(CRAWLED_IDS);
 
       if (!fin) {
-          throw std::exception("Error! Cannot find crawled docs IDs!");
+          throw std::runtime_error("Error! Cannot find crawled docs IDs!");
       }
 
       std::unordered_map<std::string, std::string> url_map;
@@ -149,7 +157,7 @@ namespace wunner
       for (auto & ranked : ranked_list) {            // show all results; later on if size grows, can add functionality to omit few last urls
           auto iter = url_map.find(ranked.second);
           if (iter == url_map.end()) {
-              throw std::exception("Page ID to URL mapping not found! Error in crawled doc IDs");
+              throw std::runtime_error("Page ID to URL mapping not found! Error in crawled doc IDs");
           }
           final_ranked_list.push_back(iter->second);
       }
@@ -158,12 +166,6 @@ namespace wunner
   std::vector<std::string> & CombinedPageRank::get_final_ranked_list()
   {
       return final_ranked_list;
-  }
-
-  // TODO: better use templates and merge with comparator of Validator
-  bool sort_comparator(const std::pair<double, std::string> &p1, const std::pair<double, std::string> &p2)
-  {
-      return p1.first > p2.first;
   }
 
 }
