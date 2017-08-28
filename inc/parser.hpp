@@ -36,7 +36,6 @@ namespace wunner
 
       public:
           Parser();
-          ~Parser();
           std::vector<std::string> get_parsed_document(std::string const &);
           const std::vector<std::string> & get_parsed_query(std::string const &);
   };

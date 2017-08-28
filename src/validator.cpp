@@ -23,25 +23,23 @@ namespace wunner
       fin.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
       try {
-          fin.open('word_list');
+          fin.open(WORD_LIST);
           while (!fin.eof()) {
               std::string word;
               fin >> word;
-              generate_n_grams(word, len);
+              generate_n_grams(word);
           }
           fin.close();
-      } catch (const ifstream::failure & ex) {
-          throw std::exception("Could not open or read the file \"word_file\"");
+      } catch (std::ifstream::failure & ex) {
+          throw std::runtime_error("Could not open or read the file \"word_file\"");
       }
 
       try {
-          fin.open('erroneous');
-          std::string incorrect;
-          std::string correct;
+          fin.open(ERRONEOUS);
+          std::string incorrect, correct;
           while (!fin.eof()) {
-              fin >> incorrect;
-              fin >> correct;
-              erroneous[incorrect] = correct;
+              fin >> incorrect >> correct;
+              erroneous.insert(std::make_pair(incorrect, correct));
           }
           fin.close();
       } catch (...) {
@@ -49,9 +47,19 @@ namespace wunner
       }
   }
 
+  bool sort_comparator(const std::pair<int, std::string> &p1, const std::pair<int, std::string> &p2)
+  {
+      return p1.first > p2.first;
+  }
+
+  int minimum(int a, int b, int c)
+  {
+      return std::min(a, std::min(b, c));
+  }
+
   void Validator::generate_n_grams(std::string const & word)
   {
-      for (int i = 0; i < word.length() - len + 1; i++) {
+      for (size_t i = 0; i < word.length() - len + 1; i++) {
           const std::string & gram = word.substr(i, len);
           word_list[gram].push_back(word);
       }
@@ -60,56 +68,52 @@ namespace wunner
       }
   }
 
-  std::unordered_set<std::pair<int, std::string>> Validator::get_n_grams(std::string const & word)
+  std::vector<std::pair<int, std::string>> Validator::get_n_grams(std::string const & word)
   {
-      std::unordered_set<std::pair<int, std::string>> values;
-      for (int i = 0; i < word.length() - len + 1; i++) {
+      std::vector<std::pair<int, std::string>> values;
+      for (size_t i = 0; i < word.length() - len + 1; i++) {
           const std::string & gram = word.substr(i, len);
           auto val = word_list[gram];
           for (auto & j : val) {
-              auto p = std::make_pair((int)0, j);
-              values.insert(p);
+              values.push_back(std::make_pair(0, j));
           }
       }
       if (word.length() < len) {
           auto val = word_list[word];
           for (auto & j : val) {
-              auto p = std::make_pair((int)0, j);
-              values.insert(p);
+              values.push_back(std::make_pair(0, j));
           }
       }
       return values;
   }
 
-  int Validator::compare_strings(std::string const & str1, std::string const & str2)
+  int Validator::compare_strings(std::string const & str1, std::string const & str2) const
   {
       int dp[str1.length()+1][str2.length()+1];
-      for (int i = 0; i <= str1.length(); i++) {
+      for (size_t i = 0; i <= str1.length(); i++) {
           dp[i][0] = i;
       }
-      for (int i = 0; i <= str2.length(); i++) {
+      for (size_t i = 0; i <= str2.length(); i++) {
           dp[0][i] = i;
       }
-      for (int i = 0; i <= str1.length(); i++) {
-          for (int j = 0; j <= str2.length(); j++) {
+      for (size_t i = 0; i <= str1.length(); i++) {
+          for (size_t j = 0; j <= str2.length(); j++) {
               if (str1[i-1] == str2[j-1]) {
                   dp[i][j] = dp[i-1][j-1];
               } else {
-                  dp[i][j] = 1 + min(dp[i][j-1], dp[i-1][j], dp[i-1][j-1]);
+                  dp[i][j] = 1 + minimum(dp[i][j-1], dp[i-1][j], dp[i-1][j-1]);
               }
           }
       }
       return dp[str1.length()][str2.length()];
   }
 
-  std::list<std::string> & Validator::suggest(std::string const & word)
+  std::list<std::string> Validator::suggest(std::string const & word)
   {
       std::list<std::string> suggestions;
-      
-      std::multimap<std::string, std::string>::iterator it;
-      std::pair<it, it> res = erroneous.equal_range(word);
 
-      for (it = res.first; it != res.second; it++) {
+      auto res = erroneous.equal_range(word);
+      for (auto it = res.first; it != res.second; it++) {
           suggestions.push_back(it->second);
       }
 
@@ -123,16 +127,6 @@ namespace wunner
       }
 
       return suggestions;
-  }
-
-  bool sort_comparator(const std::pair<int, std::string> &p1, const std::pair<int, std::string> &p2)
-  {
-      return p1.first > p2.first;
-  }
-
-  int min(int a, int b, int c)
-  {
-      return min(a, min(b, c));
   }
 
 }

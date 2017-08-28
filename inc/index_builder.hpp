@@ -5,7 +5,9 @@
  *
  */
 
+#ifndef ll
 #define ll long long
+#endif  // ll
 
 #ifndef MIN_DIFF
 #define MIN_DIFF 604800  // a week

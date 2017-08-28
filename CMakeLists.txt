@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8)
 project (Wunner)
 
 set (Wunner_VERSION_MAJOR 1)
@@ -19,8 +19,10 @@ if (BUILD_STATIC)
   set (Boost_USE_STATIC_LIBS ON)
 endif()
 
-find_package (Boost COMPONENTS regex REQUIRED)
+find_package (Boost COMPONENTS system regex REQUIRED)
 include_directories (${BOOST_INCLUDE_DIR})
+
+find_package (Threads REQUIRED)
 
 set (LIBS_WUNNER
         inc/autocomplete.hpp
@@ -39,10 +41,14 @@ set (LIBS_WUNNER
     )
 add_library (wunner_libs ${LIBS_WUNNER})
 
+link_directories (${CMAKE_SOURCE_DIR}/thirdparty/curl)
+
 set (LIBS_TO_LINK 
+        wunner_libs
         ${Boost_LIBRARIES}
         porter_stemmer
-        wunner_libs
+        ${CMAKE_THREAD_LIBS_INIT}
+        curl
     )
 
 add_executable (wunner_search src/main.cpp)
