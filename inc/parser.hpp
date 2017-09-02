@@ -6,11 +6,11 @@
  */
 
 #ifndef CRAWLER
-#define CRAWLER "crawled_dir"
+#define CRAWLER "res/crawled_dir"
 #endif  // CRAWLER
 
 #ifndef STOPPER
-#define STOPPER "stop_words"
+#define STOPPER "res/stop_words"
 #endif  // STOPPER
 
 #ifndef PARSER

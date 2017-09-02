@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 2.6)
 project (Wunner)
 
 set (Wunner_VERSION_MAJOR 1)
@@ -25,7 +25,7 @@ endif()
 
 add_library (porter_stemmer lib/PorterStemmer/porter2_stemmer.cpp)
 
-find_package (Boost COMPONENTS system regex REQUIRED)
+find_package (Boost COMPONENTS regex REQUIRED)
 include_directories (${BOOST_INCLUDE_DIR})
 
 find_package (Threads REQUIRED)

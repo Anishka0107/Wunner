@@ -6,11 +6,11 @@
  */
 
 #ifndef ERRONEOUS
-#define ERRONEOUS "../res/erroneous"
+#define ERRONEOUS "res/erroneous"
 #endif  // ERRONEOUS
 
 #ifndef WORD_LIST
-#define WORD_LIST "../res/word_list"
+#define WORD_LIST "res/word_list"
 #endif  // WORD_LIST
 
 #ifndef MAX_SUGGESTIONS

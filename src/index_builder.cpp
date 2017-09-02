@@ -7,6 +7,7 @@
 
 #include <ctime>
 #include <fstream>
+#include <iostream>
 
 #include <dirent.h>
 
@@ -18,6 +19,7 @@ namespace wunner
 
   Index::Index(IndexInfo ii)
   {
+      std::cout << "Indexing..." << std::endl;
       if (ii == IndexInfo::BUILD_INDEX) {
           build_index();
       } else {

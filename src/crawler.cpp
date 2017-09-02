@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <functional>
+#include <iostream>
 #include <queue>
 
 #include <boost/regex.hpp>
@@ -33,15 +34,21 @@ namespace wunner
 
   int Crawler::fetch_page_text(std::string const & url, std::string const & write_here) const
   {
-      return std::system(("wget " + url + " -O " + write_here).c_str());                    // a heavy system call :(
+      return std::system(("wget " + url + " -O " + write_here).c_str());            // a heavy system call :(
       // not using libcurl anymore, statically linking it is a pain, also it's a bit more complicated to write
   }
 
   void Crawler::crawl()         // remember to delete all stuff already crawled when this method is called
   {
+      std::cout << "Crawling..." << std::endl;
       std::ifstream fin(CRAWL_SEED_SRC);
       std::queue<std::string> urls;
-      while (!fin.eof()) {
+
+      if (!fin) {
+          throw std::runtime_error{"Cannot open CRAWL_SEED_SRC file! Needs seed to start crawling"};
+      }
+
+      while (fin) {
           std::string url;
           fin >> url;
           urls.push(url);
@@ -60,7 +67,10 @@ namespace wunner
               std::string url_id = get_id(url);
               std::string write_here = std::string(CRAWLED) + "/" + url_id;
               if (fetch_page_text(url, write_here)) {
+                  std::cout << "NO ";
                   continue;
+              } else {
+                  std::cout << "Fetched " << url << std::endl;
               }
               fout << url_id << " " << url << " ";
 

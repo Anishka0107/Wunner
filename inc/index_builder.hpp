@@ -14,15 +14,15 @@
 #endif  // MIN_DIFF
 
 #ifndef FILENAME
-#define FILENAME "../res/index_file"
+#define FILENAME "res/index_file"
 #endif  // FILENAME
 
 #ifndef CRAWLED
-#define CRAWLED "../res/crawled_dir"
+#define CRAWLED "res/crawled_dir"
 #endif  // CRAWLED
 
 #ifndef INDEXED_DOCS
-#define INDEXED_DOCS "../res/indexed_documents"
+#define INDEXED_DOCS "res/indexed_documents"
 #endif  // INDEXED_DOCS
 
 #ifndef BUILD_INVERTED_INDEX
