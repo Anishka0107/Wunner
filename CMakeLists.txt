@@ -19,12 +19,8 @@ set (CMAKE_SHARED_LIBRARY_C_FLAGS)         # remove -fPIC
 set (CMAKE_SHARED_LIBRARY_CXX_FLAGS)
 set (CMAKE_SHARED_LIBRARY_LINK_C_FLAGS)    # remove -rdynamic
 set (CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS)
-set (Boost_USE_STATIC_LIBS ON) # only find static libs
 
 add_library (porter_stemmer lib/PorterStemmer/porter2_stemmer.cpp)
-
-find_package (Boost COMPONENTS regex REQUIRED)
-include_directories (${BOOST_INCLUDE_DIR})
 
 find_package (Threads REQUIRED)
 
@@ -48,7 +44,6 @@ add_library (wunner_libs ${LIBS_WUNNER})
 
 set (LIBS_TO_LINK 
         wunner_libs
-        ${Boost_LIBRARIES}
         porter_stemmer
         ${CMAKE_THREAD_LIBS_INIT}
     )

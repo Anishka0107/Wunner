@@ -10,8 +10,7 @@
 #include <functional>
 #include <iostream>
 #include <queue>
-
-#include <boost/regex.hpp>
+#include <regex>
 
 #include "crawler.hpp"
 
@@ -80,10 +79,10 @@ namespace wunner
               page.assign(std::istreambuf_iterator<char>(fetch_file), std::istreambuf_iterator<char>());
               fetch_file.close();
 
-              const boost::regex link_expr("<a\\s+href=\"([\\-:\\w\\d\\.\\/]+)\">");
-              boost::match_results<std::string::const_iterator> res;
+              const std::regex link_expr("<a\\s+href=\"([\\-:\\w\\d\\.\\/]+)\">");
+              std::match_results<std::string::const_iterator> res;
               std::string::const_iterator start = page.begin(), end = page.end();
-              while (regex_search(start, end, res, link_expr)) {
+              while (std::regex_search(start, end, res, link_expr)) {
                   urls.push(res[0]);
                   pr.add_edge(get_id(res[0]), url_id);        // as we care about incoming links, add edges in opposite order
                   start = res[0].second;

@@ -22,7 +22,7 @@ temporary steps to build
 
 1. `cd Wunner` from where you cloned/downloaded it   
 
-2. a> requirements: boost, boost regex, wget and cmake  
+2. a> requirements: boost, wget and cmake  
 2. b> use cmake for generating binary  
 eg commands-> `mkdir -p build && cd build && cmake .. && make`  
 
