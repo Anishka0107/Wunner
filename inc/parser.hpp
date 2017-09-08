@@ -5,10 +5,6 @@
  *
  */
 
-#ifndef CRAWLER
-#define CRAWLER "res/crawled_dir"
-#endif  // CRAWLER
-
 #ifndef STOPPER
 #define STOPPER "res/stop_words"
 #endif  // STOPPER

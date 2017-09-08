@@ -14,7 +14,6 @@ TODO checklist:
 |* Reduce number of files used, prefer to keep things in memory wherever possible, think of database  
 |* Resolve dependencies  
 |* Better ways to serialize objects  
-|* Dynamic linking  
 |* Improve modularity  
 |* Implement interaction with robots.txt in crawler  
 |* Add standard readme  
@@ -23,14 +22,15 @@ temporary steps to build
 
 1. `cd Wunner` from where you cloned/downloaded it   
 
-2a. requirements: boost, boost regex, wget and cmake  
-2b. use cmake for generating binary, with -DBUILD_STATIC=1 option for static linking  
-eg commands-> `mkdir -p build && cd build && cmake -DBUILD_STATIC=1 .. && make`  
+2. a> requirements: boost, boost regex, wget and cmake  
+2. b> use cmake for generating binary  
+eg commands-> `mkdir -p build && cd build && cmake .. && make`  
+
+3. ultimately run `wunner_search` from root of directory Wunner
 
 OR
 
 2. using docker-> install docker on linux   
-`docker build -t wunner docker/` and `docker run -v ${PWD}:/tmp wunner` with su privileges 
-
-3. ultimately run `wunner_search` from root of directory Wunner
+   a> `docker build -t wunner .`  
+   b> `docker run wunner wunner_search` with su privileges, from any directory
 

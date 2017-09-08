@@ -5,10 +5,6 @@
  *
  */
 
-#ifndef CRAWLED
-#define CRAWLED "res/crawled_dir"
-#endif  // CRAWLED
-
 #ifndef CRAWLED_IDS
 #define CRAWLED_IDS "res/crawled_ids"
 #endif  // CRAWLED_IDS
@@ -36,6 +32,8 @@
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
+
+#include "crawler_info.hpp"
 
 namespace wunner
 {

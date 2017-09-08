@@ -34,12 +34,13 @@ namespace wunner
 
   int Crawler::fetch_page_text(std::string const & url, std::string const & write_here) const
   {
-      return std::system(("wget " + url + " -O " + write_here).c_str());            // a heavy system call :(
+      return std::system(("wget -O " + write_here + " " + url).c_str());            // a heavy system call :(
       // not using libcurl anymore, statically linking it is a pain, also it's a bit more complicated to write
   }
 
-  void Crawler::crawl()         // remember to delete all stuff already crawled when this method is called
+  void Crawler::crawl()
   {
+      std::system(("rm -rf " + std::string(CRAWLED) + " && mkdir " + std::string(CRAWLED)).c_str());    // delete already crawled stuff  // don't care about rm warning if file does not exist
       std::cout << "Crawling..." << std::endl;
       std::ifstream fin(CRAWL_SEED_SRC);
       std::queue<std::string> urls;
@@ -67,7 +68,7 @@ namespace wunner
               std::string url_id = get_id(url);
               std::string write_here = std::string(CRAWLED) + "/" + url_id;
               if (fetch_page_text(url, write_here)) {
-                  std::cout << "NO ";
+                  std::cout << "Page NOT fetched " << url << std::endl;
                   continue;
               } else {
                   std::cout << "Fetched " << url << std::endl;

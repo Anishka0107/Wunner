@@ -11,6 +11,7 @@
 
 #include <dirent.h>
 
+#include "crawler_info.hpp"
 #include "index_builder.hpp"
 #include "parser.hpp"
 

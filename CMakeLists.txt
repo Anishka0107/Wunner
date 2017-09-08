@@ -10,18 +10,16 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 include_directories (inc)
 include_directories (lib)
 
-if (BUILD_STATIC)
-  set (BUILD_SHARED_LIBRARIES OFF)
-  set (CMAKE_EXE_LINKER_FLAGS "-static")
-  set (CMAKE_FIND_LIBRARY_SUFFIXES .a)
-  set (CMAKE_EXE_LINK_DYNAMIC_C_FLAGS)       # remove -Wl,-Bdynamic
-  set (CMAKE_EXE_LINK_DYNAMIC_CXX_FLAGS)
-  set (CMAKE_SHARED_LIBRARY_C_FLAGS)         # remove -fPIC
-  set (CMAKE_SHARED_LIBRARY_CXX_FLAGS)
-  set (CMAKE_SHARED_LIBRARY_LINK_C_FLAGS)    # remove -rdynamic
-  set (CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS)
-  set (Boost_USE_STATIC_LIBS ON) # only find static libs
-endif()
+set (BUILD_SHARED_LIBRARIES OFF)
+set (CMAKE_EXE_LINKER_FLAGS "-static")
+set (CMAKE_FIND_LIBRARY_SUFFIXES .a)
+set (CMAKE_EXE_LINK_DYNAMIC_C_FLAGS)       # remove -Wl,-Bdynamic
+set (CMAKE_EXE_LINK_DYNAMIC_CXX_FLAGS)
+set (CMAKE_SHARED_LIBRARY_C_FLAGS)         # remove -fPIC
+set (CMAKE_SHARED_LIBRARY_CXX_FLAGS)
+set (CMAKE_SHARED_LIBRARY_LINK_C_FLAGS)    # remove -rdynamic
+set (CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS)
+set (Boost_USE_STATIC_LIBS ON) # only find static libs
 
 add_library (porter_stemmer lib/PorterStemmer/porter2_stemmer.cpp)
 
@@ -33,6 +31,7 @@ find_package (Threads REQUIRED)
 set (LIBS_WUNNER
         inc/autocomplete.hpp
         inc/crawler.hpp
+        inc/crawler_info.hpp
         inc/index_builder.hpp
         inc/parser.hpp
         inc/query.hpp

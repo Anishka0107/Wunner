@@ -1,3 +1,6 @@
 build/
+res/crawled_dir
+res/crawled_ids
+res/page_ranks
 *.out
 **/*.swp
