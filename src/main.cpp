@@ -6,6 +6,7 @@
  */
 
 #include <condition_variable>
+#include <cstdlib>
 #include <iostream>
 #include <mutex>
 #include <sys/stat.h>
@@ -77,8 +78,13 @@ void search_for(wunner::Index *index, wunner::Autocomplete & autocomplete, std::
     }
 }
 
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
+    if (argc > 1 && (std::string(argv[1]) == "-f" || std::string(argv[1]) == "--fresh")) {
+        std::system(("rm -rf " + std::string(CRAWLED)).c_str());
+        std::cout << "A fresh start :)" << std::endl;
+   }
+
     wunner::Crawler crawler;
     wunner::Index *index;
     wunner::Autocomplete autocomplete;
@@ -93,11 +99,13 @@ int main(int argc, char** argv)
         index = new wunner::Index(wunner::IndexInfo::BUILD_INDEX);
     }
 
-    std::mutex mutex;
+    static std::mutex mutex;
     std::condition_variable cv;
 
     auto refresh_index = [&](auto duration)
         {
+            std::this_thread::sleep_for(duration);
+
             crawler.crawl();
             wunner::Index *index_temp = new wunner::Index(wunner::IndexInfo::BUILD_INDEX);
 
@@ -105,13 +113,15 @@ int main(int argc, char** argv)
 
             delete index;
             index = index_temp;
+            std::cout << "Refreshed index!!\n";
 
             cv.notify_all();
-            std::this_thread::sleep_for(duration);
         };
 
     std::thread thread_for_search(& search_for, index, std::ref(autocomplete), std::ref(mutex), std::ref(cv));
     std::thread thread_for_refreshing_index(refresh_index, std::chrono::seconds(MIN_DIFF));
+    thread_for_search.join();
+    thread_for_refreshing_index.join();
 
     return 0;
 }

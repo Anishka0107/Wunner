@@ -5,6 +5,7 @@
  *
  */
 
+#include <cstdio>
 #include <cstdlib>
 #include <fstream>
 #include <functional>
@@ -39,7 +40,7 @@ namespace wunner
 
   void Crawler::crawl()
   {
-      std::system(("rm -rf " + std::string(CRAWLED) + " && mkdir " + std::string(CRAWLED)).c_str());    // delete already crawled stuff  // don't care about rm warning if file does not exist
+      std::system(("rm -rf " + std::string(CRAWLED) + " && mkdir " + std::string(CRAWLED)).c_str());    // delete already crawled stuff
       std::cout << "Crawling..." << std::endl;
       std::ifstream fin(CRAWL_SEED_SRC);
       std::queue<std::string> urls;
@@ -67,11 +68,16 @@ namespace wunner
               std::string url_id = get_id(url);
               std::string write_here = std::string(CRAWLED) + "/" + url_id;
               if (fetch_page_text(url, write_here)) {
-                  std::cout << "Page NOT fetched " << url << std::endl;
+                  std::cout << "Page NOT fetched " << url << "! ";
+                  if (remove(write_here.c_str())) {
+                      std::cout << "Deleted it..." << std::endl;
+                  } else {
+                      std::cout << "Not found / Couldn't delete it..." << std::endl;
+                  }
                   continue;
-              } else {
-                  std::cout << "Fetched " << url << std::endl;
               }
+
+              std::cout << "Fetched " << url << std::endl;
               fout << url_id << " " << url << " ";
 
               std::ifstream fetch_file(write_here);
@@ -79,12 +85,12 @@ namespace wunner
               page.assign(std::istreambuf_iterator<char>(fetch_file), std::istreambuf_iterator<char>());
               fetch_file.close();
 
-              const std::regex link_expr("<a\\s+href=\"([\\-:\\w\\d\\.\\/]+)\">");
+              const std::regex link_expr("<a\\s+href=\"([\\-:\\w\\d\\.\\/]+)\">", std::regex_constants::icase);
               std::match_results<std::string::const_iterator> res;
               std::string::const_iterator start = page.begin(), end = page.end();
               while (std::regex_search(start, end, res, link_expr)) {
-                  urls.push(res[0]);
-                  pr.add_edge(get_id(res[0]), url_id);        // as we care about incoming links, add edges in opposite order
+                  urls.push(res[1]);
+                  pr.add_edge(get_id(res[1]), url_id);        // as we care about incoming links, add edges in opposite order
                   start = res[0].second;
               }
 
@@ -95,6 +101,7 @@ namespace wunner
       fout.close();
 
       pr.calculate_ranks();
+      std::cout << "Crawling complete!!\n";
   }
 
   void PageRank::add_edge(std::string const & src, std::string const & dest)

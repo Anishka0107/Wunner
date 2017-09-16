@@ -25,7 +25,7 @@ namespace wunner
           build_index();
       } else {
           std::ifstream fin;
-          fin.open(FILENAME, std::ios::in);
+          fin.open(FILENAME);
           std::string key, doc_num;
           int length;
           ll pos;
@@ -53,17 +53,24 @@ namespace wunner
 
   void Index::parse_docs() const
   {
+      std::cout << "Parsing crawled documents...\n";
       std::vector<std::pair<std::string, std::vector<std::string>>> parsed_docs;
       Parser p;
+
       DIR *dir = opendir(CRAWLED);
       struct dirent *walk;
       if (dir) {
           while ((walk = readdir(dir)) != NULL) {
-              auto doc = p.get_parsed_document(walk->d_name);
+              if (std::string(walk->d_name) == "." || std::string(walk->d_name) == "..") {
+                  continue;
+              }
+              auto doc = p.get_parsed_document(std::string(CRAWLED) + "/" + walk->d_name);
               parsed_docs.push_back(std::make_pair(walk->d_name, doc));
+              std::cout << "Parsed document " << walk->d_name << std::endl;
           }
           closedir(dir);
-          
+          std::cout << "Parsing complete!\n";
+
           // write the parsed documents list to a file
           std::ofstream fout(INDEXED_DOCS);
           for (auto & doc : parsed_docs) {
@@ -73,6 +80,7 @@ namespace wunner
               }
           }
           fout.close();
+          std::cout << "Saved parsed documents list\n";
       } else {
           throw std::runtime_error("Directory containing crawled documents not present or corrupt");
       }
@@ -80,17 +88,17 @@ namespace wunner
 
   void Index::build_index()
   {
+      std::cout << "Building a fresh index...\n";
       parse_docs();
       for (auto & doc : parsed_docs) {
           int pos = 0;
           for (auto & word : doc.second) {
-              inverted_index[word].push_back(make_pair(doc.first, pos));
+              inverted_index[word].push_back(std::make_pair(doc.first, pos));
               pos++;
           }
       }
-      std::ofstream fout;
-      fout.open(FILENAME, std::ios::out);
-      // Serializing the index and storing it to a file for further reference
+
+      std::ofstream fout(FILENAME);    // Serializing the index and storing it to a file for further reference
       for (auto & word_info : inverted_index) {
           fout << word_info.first << " " << word_info.second.size() << " ";
           for (auto & place : word_info.second) {

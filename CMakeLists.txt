@@ -4,7 +4,7 @@ project (Wunner)
 set (Wunner_VERSION_MAJOR 1)
 set (Wunner_VERSION_MINOR 0)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 include_directories (inc)

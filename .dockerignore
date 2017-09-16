@@ -3,5 +3,6 @@
 .dockerignore
 Dockerfile
 build
+wunner_build.sh
 README.md
 LICENSE

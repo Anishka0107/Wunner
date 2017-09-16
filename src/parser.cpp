@@ -35,7 +35,7 @@ namespace wunner
   void Parser::tokenizer(std::string const & document)
   {
       boost::char_separator<char> sep(",.@|-\"\"\'\' \n");
-      std::ifstream fin("../" + document);
+      std::ifstream fin(document);
       if (fin) {
           std::stringstream buf;
           buf << fin.rdbuf();

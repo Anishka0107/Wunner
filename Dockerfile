@@ -16,3 +16,5 @@ RUN cd build && cmake ..
 RUN cd build && make
 
 ENV PATH $PATH:/home/Wunner/build/bin
+
+WORKDIR /tmp
