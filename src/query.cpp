@@ -114,7 +114,7 @@ namespace wunner
       bool use_page_rank = true;
 
       if (!fin) {
-          std::cerr << "Page ranks not computed or file missing/corrupted! Using fallback query based ranks";
+          std::cerr << "Page ranks not computed or file missing/corrupted! Using fallback query based ranks\n";
           use_page_rank = false;
       }
 
@@ -124,7 +124,7 @@ namespace wunner
           try {
               page_ranks[page] = std::stod(rank);    // ideally, no exceptions would occur
           } catch (std::exception & ex) {        // case when file is edited or corrupted
-              std::cerr << "Warning: Page rank file content modified! Using fallback query based ranks";
+              std::cerr << "Warning: Page rank file content modified! Using fallback query based ranks\n";
               use_page_rank = false;
           }
       }

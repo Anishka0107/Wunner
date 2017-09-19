@@ -100,19 +100,19 @@ namespace wunner
       }
       fout.close();
 
-      pr.calculate_ranks();
+      pr.calculate_ranks(visited);
       std::cout << "Crawling complete!!\n";
   }
 
   void PageRank::add_edge(std::string const & src, std::string const & dest)
   {
-      adj_lst[src].insert(dest);    
+      adj_lst[src].insert(dest);
   }
 
-  void PageRank::calculate_ranks()
+  void PageRank::calculate_ranks(std::unordered_set<std::string> const & visited)
   {
       const double damping_factor = 0.85;
-      double initial_page_rank = 1 / adj_lst.size();
+      double initial_page_rank = 1.0 / visited.size();
       std::unordered_map<std::string, std::pair<double, double>> rank_list;     // pair.first --> original rank, pair.second --> temporary rank
       std::vector<double> temp_score(adj_lst.size(), initial_page_rank);
       for (auto & node : adj_lst) {
@@ -120,12 +120,14 @@ namespace wunner
       }
 
       for (int i = 0; i < MAX_ITER_PAGE_RANK; i++) {
-          for (auto page : adj_lst) {
-              double pr = 1 - damping_factor;
-              for (auto & link : page.second) {
-                  pr += damping_factor * (rank_list[link].first / adj_lst[link].size());
+          for (auto & page : adj_lst) {
+              if (visited.find(page.first) != visited.end()) {
+                  double pr = 1 - damping_factor;
+                  for (auto & link : page.second) {
+                      pr += damping_factor * (rank_list[link].first / adj_lst[link].size());
+                  }
+                  rank_list[page.first].second = pr;
               }
-              rank_list[page.first].second = pr;
           }
 
           for (auto & page_rank : rank_list) {

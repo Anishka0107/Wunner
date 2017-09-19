@@ -1,19 +1,20 @@
-FROM ubuntu:xenial
+FROM alpine:3.6
 
-RUN apt-get update && apt-get install -y \
-build-essential \
+RUN apk add --update --no-cache \
+g++ \
+make \
 cmake \
-libboost-dev \
+boost-dev \
 wget
 
 WORKDIR /home/Wunner
 
 COPY ${PWD} .
 
-RUN mkdir -p build
-
-RUN cd build && cmake ..
-RUN cd build && make
+RUN mkdir -p build \
+&& cd build \
+&& cmake .. \
+&& make
 
 ENV PATH $PATH:/home/Wunner/build/bin
 

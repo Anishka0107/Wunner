@@ -1,46 +1,54 @@
-Wunner
+# Wunner
 
-A toy search engine which searches the web inside your terminal :p
+A toy search engine that searches the web inside your terminal :p
 
-**Development started, don't test it, nothing works as of now**
+**WARNING: Please note that it is still in development phase and does not work completely as of now. I'll have to fix a lot more bugs to get it working.**
 
-TODO checklist:
+## Features
+* Implemented in C++14
+* Crawls webpages progressively starting from seed URL(s).
+* Parses the documents and the query, trying to generate more appropriate results.
+* Builds an index (hash map) for the parsed documents.
+* The crawled documents and index are refreshed periodically.
+* Autocompletes query using a trie, based on most recently asked queries.
+* Maintains two threads, one for query search and the other for refreshing index
+* Generates most relevant results in order ranked on the basis of harmonic mean of PageRank (to get the importance of webpage) and Okapi BM25 (to get query-based result) algorithm ranks.
+* Provides query suggestions (only when the input query does not generate any results), on the basis of common incorrect and correct words. Ranks them using n-gram algorithm and edit-distance DP to compare two strings.
 
-|* Add simple main() tests for each module  
-|* For terminal based, show appropriate outputs at each step  
-|* Colors etc to be added, beautify the output  
-|* Add support for complete matching queries  
-|* Decide which option is better: i> Terminal based: simpler, provide parameters then (preferred) ii> Web UI: complex (todo laaaaater)   
-|* Reduce number of files used, prefer to keep things in memory wherever possible, think of database  
-|* Better ways to serialize objects  
-|* Improve modularity  
-|* Dynamic linking  
-|* Implement interaction with robots.txt in crawler  
-|* Provide minimum reqd versions of boost, cmake, compiler etc  
-|* Add standard readme  
+## Steps to Run
+Command to run : `wunner_search` (make sure your PWD is the project's root directory)   
+Add option `-f` or `--fresh` as in `wunner_search -f` to start the search engine afresh (i.e., crawling and indexing again)  
+- After indexing gets completed, simply type your query and hit <kbd>Enter</kbd> to start searching  
+- To use autocomplete, press <kbd>Ctrl+G</kbd> while typing query and then type the desired result's number to complete the query (it's not of relevance until a web UI is developed)  
 
-Temporary steps to build   
+## Steps to Build
+1. Clone (`git clone https://github.com/Anishka0107/Wunner.git`) or download this repository  
+2. `cd Wunner` from where it was cloned/downloaded  
 
-Compiler (ideally gcc/clang) must support C++14   
-1. `cd Wunner` from where you cloned/downloaded it   
+#### Build (tested on Linux)
+* Requirements : GCC (5.0 & above) / Clang (3.4 & above), Boost, Wget  
+3. Two options :  
+    1. Requires `ar` :  
+        1. Run `chmod +x wunner_build.sh`  
+        2. Run `./wunner_build.sh` (note that this defaults to g++ compiler; append compiler name to use other, eg: `./wunner_build.sh clang++`) 
+    2. Requires `cmake` and `make`:  
+	    1. Run `mkdir -p build && cd build && cmake .. && make -j$(nproc)`  
+4. Ultimately run `wunner_search` (either directly `./build/bin/wunner_search` or do `export PATH=$PATH:${PWD}/build/bin` before)  
 
-2. for linux, reqd->boost, wget, ar  
-   a> `chmod +x wunner_build.sh`  
-   b> `./wunner_build.sh`   
-note: this defaults to g++ compiler, to use another append compiler name to it (eg: `./wunner_build.sh clang++`)  
+#### Docker based (for Linux/Windows/OS-X)
+3. Set up [Docker](https://www.docker.com/) on your system (need root priviledges for docker commands)  
+4. Build the image using `docker build -t wunner .`  
+5. Run using `docker run -v ${PWD}:/tmp wunner wunner_search` (append wunner_search options if required)   
 
-OR
+## TODO checklist:
 
-2. requirements: make, boost, wget and cmake  
-   a> `mkdir -p build && cd build && cmake .. && make`  
-
-3. ultimately run `wunner_search` from root of directory Wunner (either directly `./build/bin/wunner_search` or do `export PATH=$PATH:${PWD}/build/bin` before)   
-
-note: to start the search engine afresh (crawling, building index etc again), add option `-f` or `--fresh` -> `wunner_search -f`   
-
-OR
-
-2. using docker-> install docker on linux/mac/win   
-   a> `docker build -t wunner .`  
-   b> `docker run -v ${PWD}:/tmp wunner wunner_search` with su privileges
-
+- [ ] Add simple main() tests for each module  
+- [ ] For terminal based, show appropriate outputs at each step  
+- [ ] Add colours beautify the output  
+- [ ] Command line options for `res` files  
+- [ ] Add support for complete matching queries  
+- [ ] Add support for relative URLs on webpage  
+- [ ] Implement interaction with robots.txt in crawler  
+- [ ] Build a web UI  
+- [ ] Database instead of files to store objects  
+- [ ] Dynamic linking in build  

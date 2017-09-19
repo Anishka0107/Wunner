@@ -73,13 +73,17 @@ namespace wunner
 
           // write the parsed documents list to a file
           std::ofstream fout(INDEXED_DOCS);
-          for (auto & doc : parsed_docs) {
-              fout << doc.first << " " << doc.second.size() << " ";
-              for (auto & word : doc.second) {
-                  fout << word << " ";
+          if (fout) {
+              for (auto & doc : parsed_docs) {
+                  fout << doc.first << " " << doc.second.size() << " ";
+                  for (auto & word : doc.second) {
+                      fout << word << " ";
+                  }
               }
+              fout.close();
+          } else {
+              throw std::runtime_error("Couldn't open list of parsed documents!!");
           }
-          fout.close();
           std::cout << "Saved parsed documents list\n";
       } else {
           throw std::runtime_error("Directory containing crawled documents not present or corrupt");
@@ -106,6 +110,7 @@ namespace wunner
           }
       }
       fout.close();
+      std::cout << "Built index successfully!\n";
   }
 
   std::vector<std::string> & Index::fetch_parsed_document(std::string const & doc_hash)

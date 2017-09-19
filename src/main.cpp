@@ -17,10 +17,13 @@
 #include "query.hpp"
 #include "validator.hpp"
 
-void search_for(wunner::Index *index, wunner::Autocomplete & autocomplete, std::mutex & mutex, std::condition_variable & cv)
+std::mutex _mutex;
+std::condition_variable _cv;
+bool writing_index = false;
+
+void search_for(wunner::Index *index, wunner::Autocomplete & autocomplete)
 {
     while (true) {
-        std::unique_lock<std::mutex> lock(mutex);
         std::string query;
         std::cin >> query;
 
@@ -47,7 +50,10 @@ void search_for(wunner::Index *index, wunner::Autocomplete & autocomplete, std::
             }
         }
 
-        cv.wait(lock);
+        std::unique_lock<std::mutex> lock(_mutex);
+        while (writing_index) {
+            _cv.wait(lock);
+        }
         autocomplete.submit_new_query(query);
         wunner::Query q(query, index);
         wunner::QueryRanker qr(q);
@@ -98,9 +104,7 @@ int main(int argc, char* argv[])
         crawler.crawl();
         index = new wunner::Index(wunner::IndexInfo::BUILD_INDEX);
     }
-
-    static std::mutex mutex;
-    std::condition_variable cv;
+    search_for(index, autocomplete);
 
     auto refresh_index = [&](auto duration)
         {
@@ -109,16 +113,17 @@ int main(int argc, char* argv[])
             crawler.crawl();
             wunner::Index *index_temp = new wunner::Index(wunner::IndexInfo::BUILD_INDEX);
 
-            std::unique_lock<std::mutex> lock(mutex);
+            std::unique_lock<std::mutex> lock(_mutex);
+            writing_index = true;
 
             delete index;
             index = index_temp;
             std::cout << "Refreshed index!!\n";
 
-            cv.notify_all();
+            _cv.notify_all();
         };
 
-    std::thread thread_for_search(& search_for, index, std::ref(autocomplete), std::ref(mutex), std::ref(cv));
+    std::thread thread_for_search(& search_for, index, std::ref(autocomplete));
     std::thread thread_for_refreshing_index(refresh_index, std::chrono::seconds(MIN_DIFF));
     thread_for_search.join();
     thread_for_refreshing_index.join();
