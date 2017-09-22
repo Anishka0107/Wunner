@@ -24,30 +24,7 @@ namespace wunner
       if (ii == IndexInfo::BUILD_INDEX) {
           build_index();
       } else {
-          std::ifstream fin;
-          fin.open(FILENAME);
-          std::string key, doc_num;
-          int length;
-          ll pos;
-          while (!fin.eof()) {
-              fin >> key >> length;
-              while (length--) {
-                  fin >> doc_num >> pos;
-                  inverted_index[key].push_back(std::make_pair(doc_num, pos));
-              }
-          }
-          fin.close();
-
-          fin.open(INDEXED_DOCS);
-          std::string word;
-          while (!fin.eof()) {
-              fin >> key >> length;
-              while (length--) {
-                  fin >> word;
-                  parsed_docs[key].push_back(word);
-              }
-          }
-          fin.close();
+          read_index();
       }
   }
 
@@ -103,14 +80,46 @@ namespace wunner
       }
 
       std::ofstream fout(FILENAME);    // Serializing the index and storing it to a file for further reference
-      for (auto & word_info : inverted_index) {
-          fout << word_info.first << " " << word_info.second.size() << " ";
-          for (auto & place : word_info.second) {
-              fout << place.first << " " << place.second << " ";
+      if (fout) {
+          for (auto & word_info : inverted_index) {
+              fout << word_info.first << " " << word_info.second.size() << " ";
+              for (auto & place : word_info.second) {
+                  fout << place.first << " " << place.second << " ";
+              }
+          }
+          fout.close();
+      } else {
+          throw std::runtime_error{"Couldn't save the index!!"};
+      }
+      std::cout << "Built index successfully!\n";
+  }
+
+  void Index::read_index()
+  {
+      std::ifstream fin;
+      fin.open(FILENAME);
+      std::string key, doc_num;
+      int length;
+      ll pos;
+      while (!fin.eof()) {
+          fin >> key >> length;
+          while (length--) {
+              fin >> doc_num >> pos;
+              inverted_index[key].push_back(std::make_pair(doc_num, pos));
           }
       }
-      fout.close();
-      std::cout << "Built index successfully!\n";
+      fin.close();
+
+      fin.open(INDEXED_DOCS);
+      std::string word;
+      while (!fin.eof()) {
+          fin >> key >> length;
+          while (length--) {
+              fin >> word;
+              parsed_docs[key].push_back(word);
+          }
+      }
+      fin.close();
   }
 
   std::vector<std::string> & Index::fetch_parsed_document(std::string const & doc_hash)

@@ -59,6 +59,8 @@ namespace wunner
       std::ofstream fout(CRAWLED_IDS);
 
       PageRank pr;
+      std::unordered_set<std::string> visited_ids;
+      std::unordered_map<std::string, int> num_outbound;
 
       while (!urls.empty() && curr_crawl_page < CRAWL_NUM_PAGE) {
           std::string url = urls.front();
@@ -85,22 +87,36 @@ namespace wunner
               page.assign(std::istreambuf_iterator<char>(fetch_file), std::istreambuf_iterator<char>());
               fetch_file.close();
 
+              std::ofstream put_file(write_here);
+              size_t ptr = 0;
+              while (ptr < page.length()) {
+                  while (ptr++ < page.length() && page[ptr] != '<') {
+                      put_file << page[ptr];
+                  }
+                  while (++ptr < page.length() && page[ptr] != '>');
+              }
+              put_file.close();
+
               const std::regex link_expr("<a\\s+href=\"([\\-:\\w\\d\\.\\/]+)\">", std::regex_constants::icase);
               std::match_results<std::string::const_iterator> res;
               std::string::const_iterator start = page.begin(), end = page.end();
+              int count_edges = 0;
               while (std::regex_search(start, end, res, link_expr)) {
                   urls.push(res[1]);
                   pr.add_edge(get_id(res[1]), url_id);        // as we care about incoming links, add edges in opposite order
                   start = res[0].second;
+                  count_edges++;
               }
 
               visited.insert(url);
+              visited_ids.insert(url_id);
+              num_outbound[url_id] = count_edges;
               curr_crawl_page++;
           }
       }
       fout.close();
 
-      pr.calculate_ranks(visited);
+      pr.calculate_ranks(visited_ids, num_outbound);
       std::cout << "Crawling complete!!\n";
   }
 
@@ -109,14 +125,13 @@ namespace wunner
       adj_lst[src].insert(dest);
   }
 
-  void PageRank::calculate_ranks(std::unordered_set<std::string> const & visited)
+  void PageRank::calculate_ranks(std::unordered_set<std::string> const & visited, std::unordered_map<std::string, int> & num_outbound)
   {
       const double damping_factor = 0.85;
       double initial_page_rank = 1.0 / visited.size();
       std::unordered_map<std::string, std::pair<double, double>> rank_list;     // pair.first --> original rank, pair.second --> temporary rank
-      std::vector<double> temp_score(adj_lst.size(), initial_page_rank);
-      for (auto & node : adj_lst) {
-          rank_list.emplace(std::make_pair(node.first, std::make_pair(initial_page_rank, 0)));
+      for (auto & node : visited) {
+          rank_list.emplace(std::make_pair(node, std::make_pair(initial_page_rank, initial_page_rank)));
       }
 
       for (int i = 0; i < MAX_ITER_PAGE_RANK; i++) {
@@ -124,7 +139,7 @@ namespace wunner
               if (visited.find(page.first) != visited.end()) {
                   double pr = 1 - damping_factor;
                   for (auto & link : page.second) {
-                      pr += damping_factor * (rank_list[link].first / adj_lst[link].size());
+                      pr += damping_factor * (rank_list[link].first / num_outbound[link]);
                   }
                   rank_list[page.first].second = pr;
               }
@@ -135,11 +150,15 @@ namespace wunner
           }
       }
 
-      for (auto & page_rank : rank_list) {
-          std::ofstream fout(PAGE_RANKS);
-          fout << page_rank.first << " " << page_rank.second.first << " ";
+      std::ofstream fout(PAGE_RANKS);
+      if (fout) {
+          for (auto & page_rank : rank_list) {
+              fout << page_rank.first << " " << page_rank.second.first << " ";
+          }
+          fout.close();
+      } else {
+          std::cerr << "WARNING: Cannot save page ranks! Will have to resort to query based ranks!\n";
       }
   }
 
 }
-

@@ -58,7 +58,7 @@ namespace wunner
 
       public:
           void add_edge(std::string const &, std::string const &);
-          void calculate_ranks(std::unordered_set<std::string> const &);
+          void calculate_ranks(std::unordered_set<std::string> const &, std::unordered_map<std::string, int> &);
   };
 
 }

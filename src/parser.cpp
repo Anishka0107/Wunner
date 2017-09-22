@@ -105,7 +105,8 @@ namespace wunner
 
   const std::vector<std::string> & Parser::get_parsed_query(std::string const & query) 
   {
-      tokenizer(query);
+      parsed_doc.clear();
+      query_tokenizer(query);
       normalizer();
       stop_words_removal();
       stemmer();

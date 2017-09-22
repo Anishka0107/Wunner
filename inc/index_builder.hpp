@@ -41,6 +41,7 @@ namespace wunner
           std::unordered_map<std::string, std::vector<std::string>> parsed_docs;
           void parse_docs() const;
           void build_index();
+          void read_index();
 
       public:
           Index(IndexInfo);
