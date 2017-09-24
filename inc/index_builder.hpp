@@ -39,7 +39,7 @@ namespace wunner
           // timestamping
           std::unordered_map<std::string, std::vector<std::pair<std::string, ll>>> inverted_index;
           std::unordered_map<std::string, std::vector<std::string>> parsed_docs;
-          void parse_docs() const;
+          void parse_docs();
           void build_index();
           void read_index();
 

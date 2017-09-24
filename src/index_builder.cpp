@@ -28,10 +28,9 @@ namespace wunner
       }
   }
 
-  void Index::parse_docs() const
+  void Index::parse_docs()
   {
       std::cout << "Parsing crawled documents...\n";
-      std::vector<std::pair<std::string, std::vector<std::string>>> parsed_docs;
       Parser p;
 
       DIR *dir = opendir(CRAWLED);
@@ -42,7 +41,7 @@ namespace wunner
                   continue;
               }
               auto doc = p.get_parsed_document(std::string(CRAWLED) + "/" + walk->d_name);
-              parsed_docs.push_back(std::make_pair(walk->d_name, doc));
+              parsed_docs[walk->d_name] = doc;
               std::cout << "Parsed document " << walk->d_name << std::endl;
           }
           closedir(dir);

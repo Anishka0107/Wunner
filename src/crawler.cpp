@@ -87,7 +87,7 @@ namespace wunner
               page.assign(std::istreambuf_iterator<char>(fetch_file), std::istreambuf_iterator<char>());
               fetch_file.close();
 
-              std::ofstream put_file(write_here);
+              std::ofstream put_file(write_here, std::ios::trunc);
               size_t ptr = 0;
               while (ptr < page.length()) {
                   while (ptr++ < page.length() && page[ptr] != '<') {

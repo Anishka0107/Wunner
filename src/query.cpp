@@ -37,7 +37,7 @@ namespace wunner
 
   const std::set<std::string> & Query::get_union_docs()
   {
-      // returns a set of all those documents which contain the occurence of even one word from the parsed query
+      // returns a set of all those documents which contain the occurrence of even one word from the parsed query
       for (auto & word : processed_query) {
           for (auto & res : (*i).get_index(word)) {
               union_docs.insert(res.first);
@@ -50,16 +50,17 @@ namespace wunner
   
   QueryRanker::QueryRanker(Query & q, double k1, double b)
   {
-      std::set<std::string> docs = q.get_union_docs();
+      auto docs = q.get_union_docs();
+      auto processed_query = q.get_processed_query();
       for (auto & doc_name : docs) {
-          auto & doc = q.i->fetch_parsed_document(doc_name);
+          auto doc = q.i->fetch_parsed_document(doc_name);
           doc_info[doc_name].first = doc.size();
-          for (auto & word : q.get_processed_query()) {
+          for (auto & word : processed_query) {
               doc_info[doc_name].second.push_back(std::count(doc.begin(), doc.end(), word));
           }
       }
 
-      avg_doc_len = 0;
+      avg_doc_len = 0.0;
       for (auto & d : doc_info) {
           avg_doc_len += d.second.first;
       }
@@ -67,7 +68,7 @@ namespace wunner
       this->k1 = k1;
       this->b = b;
 
-      for (size_t j = 0; j < q.get_processed_query().size(); j++) {
+      for (size_t j = 0; j < processed_query.size(); j++) {
           ll f = 0;
           for (auto & doc : doc_info) {
               if (doc.second.second[j]) {
@@ -119,12 +120,13 @@ namespace wunner
       }
 
       while (fin) {
-          std::string page, rank;
+          std::string page;
+          double rank;
           fin >> page >> rank;
           try {
-              page_ranks[page] = std::stod(rank);    // ideally, no exceptions would occur
+              page_ranks[page] = rank;    // ideally, no exceptions would occur
           } catch (std::exception & ex) {        // case when file is edited or corrupted
-              std::cerr << "Warning: Page rank file content modified! Using fallback query based ranks\n";
+              std::cerr << "WARNING: Page rank file content modified! Using fallback query based ranks\n";
               use_page_rank = false;
           }
       }

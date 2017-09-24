@@ -52,3 +52,8 @@ Add option `-f` or `--fresh` as in `wunner_search -f` to start the search engine
 - [ ] Build a web UI  
 - [ ] Database instead of files to store objects  
 - [ ] Dynamic linking in build  
+
+#### Resources
+* Crawler Seed URLs ->    
+* Erroneous Words ->   
+* List of Stop Words -> https://www.webconfs.com/stop-words.php  

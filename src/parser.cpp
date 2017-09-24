@@ -28,7 +28,7 @@ namespace wunner
               stop_words.insert(stop_word);
           }
       } else {
-          // do nothing as of now
+          std::cerr << "WARNING: Couldn't find list of stop words to filter out!";
       }
   }
   
@@ -105,7 +105,6 @@ namespace wunner
 
   const std::vector<std::string> & Parser::get_parsed_query(std::string const & query) 
   {
-      parsed_doc.clear();
       query_tokenizer(query);
       normalizer();
       stop_words_removal();
