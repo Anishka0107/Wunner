@@ -24,9 +24,8 @@ namespace wunner
 
       try {
           fin.open(WORD_LIST);
-          while (!fin.eof()) {
-              std::string word;
-              fin >> word;
+          std::string word;
+          while (fin >> word) {
               generate_n_grams(word);
           }
           fin.close();
@@ -37,8 +36,7 @@ namespace wunner
       try {
           fin.open(ERRONEOUS);
           std::string incorrect, correct;
-          while (!fin.eof()) {
-              fin >> incorrect >> correct;
+          while (fin >> incorrect >> correct) {
               erroneous.insert(std::make_pair(incorrect, correct));
           }
           fin.close();

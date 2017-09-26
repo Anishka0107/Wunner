@@ -119,12 +119,10 @@ namespace wunner
           use_page_rank = false;
       }
 
-      while (fin) {
-          std::string page;
-          double rank;
-          fin >> page >> rank;
+      std::string page, rank;       // reading in string and parsing later to double, to check wrong values (eg: inf) 
+      while (fin >> page >> rank) {
           try {
-              page_ranks[page] = rank;    // ideally, no exceptions would occur
+              page_ranks[page] = std::stod(rank);    // ideally, no exceptions would occur
           } catch (std::exception & ex) {        // case when file is edited or corrupted
               std::cerr << "WARNING: Page rank file content modified! Using fallback query based ranks\n";
               use_page_rank = false;
@@ -149,9 +147,8 @@ namespace wunner
       }
 
       std::unordered_map<std::string, std::string> url_map;
-      while (fin) {
-          std::string url_id, url;
-          fin >> url_id >> url;
+      std::string url_id, url;
+      while (fin >> url_id >> url) {
           url_map[url_id] = url;
       }
       fin.close();

@@ -49,9 +49,8 @@ namespace wunner
           throw std::runtime_error{"Cannot open CRAWL_SEED_SRC file! Needs seed to start crawling"};
       }
 
-      while (fin) {
-          std::string url;
-          fin >> url;
+      std::string url;
+      while (fin >> url) {
           urls.push(url);
       }
 

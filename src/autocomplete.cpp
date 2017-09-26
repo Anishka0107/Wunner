@@ -26,7 +26,7 @@ namespace wunner
   void Trie::insert(std::string const & query)
   {
       Node* curr = root;
-      for (int i = 0; i < ALPHABET_SIZE; i++) {
+      for (size_t i = 0; i < query.length(); i++) {
           int index = (int)query[i] - ASCII_START_CODE;
           if (curr->children[index] == NULL) {
               curr->children[index] = new Node();
@@ -89,19 +89,19 @@ namespace wunner
       return results;
   }
 
-  void Trie::get_all_children(Node* root, std::string & prefix, std::vector<std::string> & results)
+  void Trie::get_all_children(Node* curr_root, std::string & prefix, std::vector<std::string> & results)
   {
       if (results.size() > MAX_RESULTS) {
           return;
       }
-      if (root->is_leaf) {
+      if (curr_root->is_leaf) {
           results.push_back(prefix);
       }
       for (int i = 0; i < ALPHABET_SIZE; i++) {
-          if (root->children[i]) {
+          if (curr_root->children[i]) {
               char next = i + ASCII_START_CODE;
               prefix.push_back(next);
-              get_all_children(root->children[i], prefix, results);
+              get_all_children(curr_root->children[i], prefix, results);
               prefix.pop_back();
           }
       }
@@ -123,4 +123,3 @@ namespace wunner
   }
 
 }
-

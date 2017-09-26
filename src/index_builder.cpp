@@ -100,8 +100,7 @@ namespace wunner
       std::string key, doc_num;
       int length;
       ll pos;
-      while (!fin.eof()) {
-          fin >> key >> length;
+      while (fin >> key >> length) {
           while (length--) {
               fin >> doc_num >> pos;
               inverted_index[key].push_back(std::make_pair(doc_num, pos));
@@ -111,8 +110,7 @@ namespace wunner
 
       fin.open(INDEXED_DOCS);
       std::string word;
-      while (!fin.eof()) {
-          fin >> key >> length;
+      while (fin >> key >> length) {
           while (length--) {
               fin >> word;
               parsed_docs[key].push_back(word);

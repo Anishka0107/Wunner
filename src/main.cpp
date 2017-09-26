@@ -24,6 +24,7 @@ bool writing_index = false;
 void search_for(wunner::Index *index, wunner::Autocomplete & autocomplete)
 {
     while (true) {
+        std::cout << "Enter your query : ";
         std::string query;
         std::cin >> query;
 
@@ -55,6 +56,7 @@ void search_for(wunner::Index *index, wunner::Autocomplete & autocomplete)
             _cv.wait(lock);
         }
         autocomplete.submit_new_query(query);
+
         wunner::Query q(query, index);
         wunner::QueryRanker qr(q);
         auto rl = qr.fetch_ranked_list();
@@ -62,6 +64,7 @@ void search_for(wunner::Index *index, wunner::Autocomplete & autocomplete)
         auto cpr_list = cpr.get_final_ranked_list();     // outputs sorted list based on rank; the strings are document URLs, not hashes
  
         if (cpr_list.empty()) {            // if even a single page is found, consider query valid, so no suggestions
+            std::cout << "No results found! :(\n";
             wunner::Validator validator;
             auto processed_query = q.get_processed_query();
             int count = 0;
@@ -78,6 +81,7 @@ void search_for(wunner::Index *index, wunner::Autocomplete & autocomplete)
             return;
         }
 
+        std::cout << "The following results were generated :\n";
         for (auto & page : cpr_list) {
             std::cout << page << std::endl;
         }
