@@ -13,15 +13,10 @@
 #include "crawler.hpp"
 #include "parser.hpp"
 #include "query.hpp"
+#include "utils.hpp"
 
 namespace wunner
 {
-
-  // TODO: better use templates and merge with comparator of Validator
-  bool sort_comparator(const std::pair<double, std::string> &p1, const std::pair<double, std::string> &p2)
-  {
-      return p1.first > p2.first;
-  }
 
   Query::Query(std::string const & query, Index *idx)
   {
@@ -138,7 +133,7 @@ namespace wunner
           }
       }
 
-      sort(ranked_list.begin(), ranked_list.end(), sort_comparator);
+      sort(ranked_list.begin(), ranked_list.end(), sort_comparator<double>);
 
       fin.open(CRAWLED_IDS);
 

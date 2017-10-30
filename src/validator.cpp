@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <fstream>
 
+#include "utils.hpp"
 #include "validator.hpp"
 
 namespace wunner 
@@ -43,11 +44,6 @@ namespace wunner
       } catch (...) {
           // do not throw error if it doesn't exist or is corrupt
       }
-  }
-
-  bool sort_comparator(const std::pair<int, std::string> &p1, const std::pair<int, std::string> &p2)
-  {
-      return p1.first > p2.first;
   }
 
   int minimum(int a, int b, int c)
@@ -119,7 +115,7 @@ namespace wunner
       for (auto & value : values) {
           value.first = compare_strings(value.second, word);
       }
-      sort(values.begin(), values.end(), sort_comparator);
+      sort(values.begin(), values.end(), sort_comparator<int>);
       for (auto & value : values) {
           suggestions.push_back(value.second);
       }

@@ -91,7 +91,7 @@ namespace wunner
 
   void Trie::get_all_children(Node* curr_root, std::string & prefix, std::vector<std::string> & results)
   {
-      if (results.size() > MAX_RESULTS) {
+      if (results.size() > MAX_RESULTS || curr_root == NULL) {
           return;
       }
       if (curr_root->is_leaf) {

@@ -2,16 +2,14 @@
 
 A toy search engine that searches the web inside your terminal :p
 
-**WARNING: Please note that it is still in development phase and does not work completely as of now. I'll have to fix a lot more bugs to get it working.**
-
 ## Features
-* Implemented in C++14
+* Implemented in C++14.
 * Crawls webpages progressively starting from seed URL(s).
 * Parses the documents and the query, trying to generate more appropriate results.
 * Builds an index (hash map) for the parsed documents.
 * The crawled documents and index are refreshed periodically.
 * Autocompletes query using a trie, based on most recently asked queries.
-* Maintains two threads, one for query search and the other for refreshing index
+* Maintains two threads, to allow refreshing the index and querying simultaneuosly.
 * Generates most relevant results in order ranked on the basis of harmonic mean of PageRank (to get the importance of webpage) and Okapi BM25 (to get query-based result) algorithm ranks.
 * Provides query suggestions (only when the input query does not generate any results), on the basis of common incorrect and correct words. Ranks them using n-gram algorithm and edit-distance DP to compare two strings.
 

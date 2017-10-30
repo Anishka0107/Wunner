@@ -33,4 +33,8 @@ rm *.o
 cd ..
 echo "Creating binary wunner_search..."
 $compiler -static -Iinc src/main.cpp -Lbuild -lwunner_libs -lporter_stemmer -lpthread -o build/bin/wunner_search
-file build/bin/wunner_search
+{
+  file build/bin/wunner_search
+} || {
+  echo "Built successfully!"
+}
